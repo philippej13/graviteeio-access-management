@@ -19,7 +19,8 @@ import io.gravitee.am.common.jwt.Claims;
 import io.gravitee.am.common.jwt.JWT;
 import io.gravitee.am.common.oidc.StandardClaims;
 import io.gravitee.am.gateway.handler.jwt.JwtService;
-import io.gravitee.am.gateway.handler.oauth2.client.ClientService;
+import io.gravitee.am.gateway.handler.oauth2.client.ClientSyncService;
+import io.gravitee.am.gateway.handler.oauth2.exception.InvalidRequestException;
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidTokenException;
 import io.gravitee.am.gateway.handler.oauth2.exception.ServerErrorException;
 import io.gravitee.am.gateway.handler.oauth2.token.Token;
@@ -29,7 +30,7 @@ import io.gravitee.am.gateway.handler.vertx.RxWebTestBase;
 import io.gravitee.am.gateway.handler.vertx.handler.ExceptionHandler;
 import io.gravitee.am.gateway.handler.vertx.handler.oidc.endpoint.UserInfoEndpoint;
 import io.gravitee.am.gateway.handler.vertx.handler.oidc.handler.UserInfoRequestParseHandler;
-import io.gravitee.am.gateway.service.UserService;
+import io.gravitee.am.service.UserService;
 import io.gravitee.am.model.Client;
 import io.gravitee.am.model.User;
 import io.gravitee.common.http.HttpHeaders;
@@ -48,8 +49,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -58,24 +58,18 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(MockitoJUnitRunner.class)
 public class UserInfoEndpointHandlerTest extends RxWebTestBase {
-
-    @InjectMocks
-    private UserInfoEndpoint userInfoEndpoint = new UserInfoEndpoint();
-
-    @InjectMocks
-    private UserInfoRequestParseHandler userInfoRequestParseHandler = new UserInfoRequestParseHandler();
-
     @Mock
     private UserService userService;
 
     @Mock
     private TokenService tokenService;
 
-    @Mock
-    private JwtService jwtService;
+    @InjectMocks
+    private UserInfoEndpoint userInfoEndpoint = new UserInfoEndpoint(userService);
 
-    @Mock
-    private ClientService clientService;
+    @InjectMocks
+    private UserInfoRequestParseHandler userInfoRequestParseHandler = new UserInfoRequestParseHandler(tokenService);
+
 
     @Override
     public void setUp() throws Exception {
@@ -89,6 +83,8 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
 
     @Test
     public void shouldNotInvokeUserEndpoint_noBearerToken() throws Exception {
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.error(new InvalidRequestException("An access token is required")));
+
         testRequest(
                 HttpMethod.GET, "/userinfo",
                 HttpStatusCode.BAD_REQUEST_400, "Bad Request");
@@ -96,49 +92,16 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
 
     @Test
     public void shouldNotInvokeUserEndpoint_invalidHeaderBearerToken() throws Exception {
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.error(new InvalidRequestException("The access token must be sent using the Authorization header field")));
+
         testRequest(
                 HttpMethod.GET, "/userinfo", req -> req.putHeader(HttpHeaders.AUTHORIZATION, "Error token"),
                 HttpStatusCode.BAD_REQUEST_400, "Bad Request", null);
     }
 
     @Test
-    public void shouldNotInvokeUserEndpoint_invalidToken_jwtDecode() throws Exception {
-        when(jwtService.decode(anyString())).thenReturn(Single.error(new ServerErrorException()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.empty());
-
-        testRequest(
-                HttpMethod.GET, "/userinfo", req -> req.putHeader(HttpHeaders.AUTHORIZATION, "Bearer test-token"),
-                HttpStatusCode.BAD_REQUEST_400, "Bad Request", null);
-    }
-
-    @Test
-    public void shouldNotInvokeUserEndpoint_invalidToken_noClient() throws Exception {
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.empty());
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.empty());
-
-        testRequest(
-                HttpMethod.GET, "/userinfo", req -> req.putHeader(HttpHeaders.AUTHORIZATION, "Bearer test-token"),
-                HttpStatusCode.UNAUTHORIZED_401, "Unauthorized", null);
-    }
-
-    @Test
-    public void shouldNotInvokeUserEndpoint_unknownToken() throws Exception {
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.empty());
-
-        testRequest(
-                HttpMethod.GET, "/userinfo", req -> req.putHeader(HttpHeaders.AUTHORIZATION, "Bearer test-token"),
-                HttpStatusCode.UNAUTHORIZED_401, "Unauthorized", null);
-    }
-
-    @Test
     public void shouldNotInvokeUserEndpoint_expiredToken() throws Exception {
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.error(new InvalidTokenException("Token expired")));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.error(new InvalidTokenException("The access token is invalid")));
 
         testRequest(
                 HttpMethod.GET, "/userinfo", req -> req.putHeader(HttpHeaders.AUTHORIZATION, "Bearer test-token"),
@@ -153,9 +116,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
         Token token = new AccessToken("id-token");
         token.setSubject("id-client");
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(client));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.error(new InvalidRequestException("The access token was not issued for an End-User")));
 
         testRequest(
                 HttpMethod.GET, "/userinfo", req -> req.putHeader(HttpHeaders.AUTHORIZATION, "Bearer test-token"),
@@ -169,9 +130,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
         token.setExpiresIn(100);
         token.setScope("openid");
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.empty());
 
         testRequest(
@@ -188,9 +147,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
         User user = new User();
         user.setAdditionalInformation(Collections.singletonMap("sub", "user"));
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
         testRequest(
@@ -208,9 +165,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
         User user = new User();
         user.setAdditionalInformation(Collections.singletonMap("sub", "user"));
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
 
@@ -229,9 +184,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
         User user = new User();
         user.setAdditionalInformation(Collections.singletonMap("sub", "user"));
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
         testRequest(
@@ -249,9 +202,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
 
         User user = createUser();
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
         testRequest(
@@ -276,9 +227,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
 
         User user = createUser();
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
         testRequest(
@@ -302,9 +251,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
 
         User user = createUser();
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
         testRequest(
@@ -330,9 +277,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
 
         User user = createUser();
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
         testRequest(
@@ -360,9 +305,7 @@ public class UserInfoEndpointHandlerTest extends RxWebTestBase {
 
         User user = createUser();
 
-        when(jwtService.decode(anyString())).thenReturn(Single.just(new JWT()));
-        when(clientService.findByClientId(anyString())).thenReturn(Maybe.just(new Client()));
-        when(tokenService.getAccessToken(anyString(), any())).thenReturn(Maybe.just(token));
+        when(tokenService.extractAccessToken(any(),eq(true))).thenReturn(Maybe.just(token));
         when(userService.findById(anyString())).thenReturn(Maybe.just(user));
 
         testRequest(

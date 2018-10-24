@@ -16,7 +16,8 @@
 package io.gravitee.am.gateway.handler.vertx.handler.oauth2;
 
 import io.gravitee.am.gateway.handler.oauth2.approval.ApprovalService;
-import io.gravitee.am.gateway.handler.oauth2.client.ClientService;
+import io.gravitee.am.gateway.handler.oauth2.assertion.ClientAssertionService;
+import io.gravitee.am.gateway.handler.oauth2.client.ClientSyncService;
 import io.gravitee.am.gateway.handler.oauth2.granter.TokenGranter;
 import io.gravitee.am.gateway.handler.oauth2.introspection.IntrospectionService;
 import io.gravitee.am.gateway.handler.oauth2.revocation.RevocationTokenService;
@@ -24,6 +25,7 @@ import io.gravitee.am.gateway.handler.oauth2.scope.ScopeService;
 import io.gravitee.am.gateway.handler.oauth2.token.TokenService;
 import io.gravitee.am.gateway.handler.oidc.discovery.OpenIDDiscoveryService;
 import io.gravitee.am.gateway.handler.oidc.flow.Flow;
+import io.gravitee.am.gateway.handler.vertx.auth.handler.ClientAssertionAuthHandler;
 import io.gravitee.am.gateway.handler.vertx.auth.handler.ClientBasicAuthHandler;
 import io.gravitee.am.gateway.handler.vertx.auth.handler.ClientCredentialsAuthHandler;
 import io.gravitee.am.gateway.handler.vertx.auth.handler.RedirectAuthHandler;
@@ -62,7 +64,7 @@ public class OAuth2Router {
     private Flow flow;
 
     @Autowired
-    private ClientService clientService;
+    private ClientSyncService clientSyncService;
 
     @Autowired
     private TokenService tokenService;
@@ -83,6 +85,9 @@ public class OAuth2Router {
     private OpenIDDiscoveryService openIDDiscoveryService;
 
     @Autowired
+    private ClientAssertionService clientAssertionService;
+
+    @Autowired
     private ThymeleafTemplateEngine thymeleafTemplateEngine;
 
     @Autowired
@@ -96,10 +101,11 @@ public class OAuth2Router {
         final Router router = Router.router(vertx);
 
         // create authentication handlers
-        final AuthProvider clientAuthProvider = new AuthProvider(new ClientAuthenticationProvider(clientService));
+        final AuthProvider clientAuthProvider = new AuthProvider(new ClientAuthenticationProvider(clientSyncService));
 
         final AuthHandler clientAuthHandler = ChainAuthHandler.newInstance(new ClientChainAuthHandler())
                 .append(ClientCredentialsAuthHandler.create(clientAuthProvider.getDelegate()))
+                .append(ClientAssertionAuthHandler.create(clientAuthProvider.getDelegate(),clientAssertionService))
                 .append(ClientBasicAuthHandler.create(clientAuthProvider.getDelegate()));
 
         final AuthHandler userAuthHandler = RedirectAuthHandler.create(
@@ -108,11 +114,11 @@ public class OAuth2Router {
         // Bind OAuth2 endpoints
         // Authorization endpoint
         Handler<RoutingContext> authorizationRequestParseRequiredParametersHandler = new AuthorizationRequestParseRequiredParametersHandler(openIDDiscoveryService);
-        Handler<RoutingContext> authorizationRequestParseClientHandler = new AuthorizationRequestParseClientHandler(clientService);
+        Handler<RoutingContext> authorizationRequestParseClientHandler = new AuthorizationRequestParseClientHandler(clientSyncService);
         Handler<RoutingContext> authorizationRequestParseParametersHandler = new AuthorizationRequestParseParametersHandler(domain);
         Handler<RoutingContext> authorizeEndpoint = new AuthorizationEndpointHandler(flow, domain);
         Handler<RoutingContext> authorizeApprovalEndpoint = new AuthorizationApprovalEndpointHandler(approvalService);
-        Handler<RoutingContext> userApprovalEndpoint = new UserApprovalEndpointHandler(clientService, scopeService, thymeleafTemplateEngine);
+        Handler<RoutingContext> userApprovalEndpoint = new UserApprovalEndpointHandler(clientSyncService, scopeService, thymeleafTemplateEngine);
         // Token endpoint
         Handler<RoutingContext> tokenEndpoint = new TokenEndpointHandler(tokenGranter);
         Handler<RoutingContext> tokenRequestParseHandler = new TokenRequestParseHandler();

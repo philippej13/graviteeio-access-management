@@ -16,11 +16,11 @@
 package io.gravitee.am.gateway.handler.vertx.handler.oauth2.endpoint.authorization;
 
 import io.gravitee.am.common.oidc.ResponseType;
-import io.gravitee.am.gateway.handler.oauth2.exception.OAuth2Exception;
+import io.gravitee.am.common.oauth2.exception.OAuth2Exception;
 import io.gravitee.am.gateway.handler.oauth2.exception.RedirectMismatchException;
 import io.gravitee.am.gateway.handler.oauth2.request.AuthorizationRequest;
 import io.gravitee.am.gateway.handler.oauth2.utils.OAuth2Constants;
-import io.gravitee.am.gateway.handler.utils.UriBuilder;
+import io.gravitee.am.service.utils.UriBuilder;
 import io.gravitee.am.gateway.handler.vertx.auth.handler.RedirectAuthHandler;
 import io.gravitee.am.gateway.handler.vertx.handler.oauth2.request.AuthorizationRequestFactory;
 import io.gravitee.am.gateway.handler.vertx.utils.UriBuilderRequest;

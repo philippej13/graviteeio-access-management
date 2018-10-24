@@ -11,8 +11,16 @@ mat-list-item {
   }
 }
 
+.dynamic-client-registration {
+  margin-bottom: 20px;
+}
+
 .idtoken-description {
   font-size: smaller;
+}
+
+.idtoken-validity {
+  margin-top: 20px;
 }
 
 ngx-datatable.material {

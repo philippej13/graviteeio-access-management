@@ -17,6 +17,7 @@ package io.gravitee.am.service;
 
 import io.gravitee.am.model.*;
 import io.gravitee.am.model.oauth2.Scope;
+import io.gravitee.am.model.oidc.OIDCSettings;
 import io.gravitee.am.repository.exceptions.TechnicalException;
 import io.gravitee.am.repository.management.api.DomainRepository;
 import io.gravitee.am.service.exception.DomainAlreadyExistsException;
@@ -26,12 +27,14 @@ import io.gravitee.am.service.exception.TechnicalManagementException;
 import io.gravitee.am.service.impl.DomainServiceImpl;
 import io.gravitee.am.service.model.NewDomain;
 import io.gravitee.am.service.model.NewSystemScope;
+import io.gravitee.am.service.model.PatchDomain;
 import io.gravitee.am.service.model.UpdateDomain;
 import io.gravitee.am.service.model.UpdateLoginForm;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -295,7 +298,50 @@ public class DomainServiceTest {
         testObserver.assertNotComplete();
 
         verify(domainRepository, times(1)).findById(anyString());
-        verify(domainRepository, never()).create(any(Domain.class));
+        verify(domainRepository, never()).update(any(Domain.class));
+    }
+
+    @Test
+    public void shouldPatch_domainNotFound() {
+        PatchDomain patchDomain = Mockito.mock(PatchDomain.class);
+        when(domainRepository.findById("my-domain")).thenReturn(Maybe.empty());
+
+        TestObserver testObserver = domainService.patch("my-domain", patchDomain).test();
+        testObserver.assertError(DomainNotFoundException.class);
+        testObserver.assertNotComplete();
+
+        verify(domainRepository, times(1)).findById(anyString());
+        verify(domainRepository, never()).update(any(Domain.class));
+    }
+
+    @Test
+    public void shouldPatch() {
+        PatchDomain patchDomain = Mockito.mock(PatchDomain.class);
+        when(patchDomain.patch(any())).thenReturn(new Domain());
+        when(domainRepository.findById("my-domain")).thenReturn(Maybe.just(new Domain()));
+        when(domainRepository.update(any(Domain.class))).thenReturn(Single.just(new Domain()));
+
+        TestObserver testObserver = domainService.patch("my-domain", patchDomain).test();
+        testObserver.awaitTerminalEvent();
+
+        testObserver.assertComplete();
+        testObserver.assertNoErrors();
+
+        verify(domainRepository, times(1)).findById(anyString());
+        verify(domainRepository, times(1)).update(any(Domain.class));
+    }
+
+    @Test
+    public void shouldPatch_technicalException() {
+        PatchDomain patchDomain = Mockito.mock(PatchDomain.class);
+        when(domainRepository.findById("my-domain")).thenReturn(Maybe.error(TechnicalException::new));
+
+        TestObserver testObserver = domainService.patch("my-domain", patchDomain).test();
+        testObserver.assertError(TechnicalManagementException.class);
+        testObserver.assertNotComplete();
+
+        verify(domainRepository, times(1)).findById(anyString());
+        verify(domainRepository, never()).update(any(Domain.class));
     }
 
     @Test
@@ -565,5 +611,73 @@ public class DomainServiceTest {
         testObserver.assertNotComplete();
 
         verify(domainRepository, never()).update(any(Domain.class));
+    }
+
+    @Test
+    public void isDynamicClientRegistrationEnabled() {
+        Domain domain = new Domain();
+        domain.setOidc(OIDCSettings.defaultSettings());
+
+        boolean isEnabled = domainService.isDynamicClientRegistrationEnabled(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
+    }
+
+    @Test
+    public void isDynamicClientRegistrationEnabled_missingOidcSettings() {
+        Domain domain = new Domain();
+
+        boolean isEnabled = domainService.isDynamicClientRegistrationEnabled(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
+    }
+
+    @Test
+    public void isRedirectUriLocalhostAllowed() {
+        Domain domain = new Domain();
+        domain.setOidc(OIDCSettings.defaultSettings());
+
+        boolean isEnabled = domainService.isRedirectUriLocalhostAllowed(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
+    }
+
+    @Test
+    public void isRedirectUriLocalhostAllowed_missingOidcSettings() {
+        Domain domain = new Domain();
+
+        boolean isEnabled = domainService.isRedirectUriLocalhostAllowed(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
+    }
+
+    @Test
+    public void isRedirectUriUnsecuredHttpSchemeAllowed() {
+        Domain domain = new Domain();
+        domain.setOidc(OIDCSettings.defaultSettings());
+
+        boolean isEnabled = domainService.isRedirectUriUnsecuredHttpSchemeAllowed(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
+    }
+
+    @Test
+    public void isRedirectUriUnsecuredHttpSchemeAllowed_missingOidcSettings() {
+        Domain domain = new Domain();
+
+        boolean isEnabled = domainService.isRedirectUriUnsecuredHttpSchemeAllowed(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
+    }
+
+    @Test
+    public void isRedirectUriWildcardAllowed() {
+        Domain domain = new Domain();
+        domain.setOidc(OIDCSettings.defaultSettings());
+
+        boolean isEnabled = domainService.isRedirectUriWildcardAllowed(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
+    }
+
+    @Test
+    public void isRedirectUriWildcardAllowed_missingOidcSettings() {
+        Domain domain = new Domain();
+
+        boolean isEnabled = domainService.isRedirectUriWildcardAllowed(domain);
+        Assert.assertFalse("By default dcr settings should be disabled",isEnabled);
     }
 }

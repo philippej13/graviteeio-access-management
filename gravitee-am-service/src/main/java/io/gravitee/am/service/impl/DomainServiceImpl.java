@@ -21,11 +21,23 @@ import io.gravitee.am.model.common.event.Event;
 import io.gravitee.am.model.common.event.Payload;
 import io.gravitee.am.model.common.event.Type;
 import io.gravitee.am.model.login.LoginForm;
+import io.gravitee.am.model.oidc.OIDCSettings;
 import io.gravitee.am.repository.management.api.DomainRepository;
-import io.gravitee.am.service.*;
-import io.gravitee.am.service.exception.*;
+import io.gravitee.am.service.CertificateService;
+import io.gravitee.am.service.ClientService;
+import io.gravitee.am.service.DomainService;
+import io.gravitee.am.service.IdentityProviderService;
+import io.gravitee.am.service.RoleService;
+import io.gravitee.am.service.ScopeService;
+import io.gravitee.am.service.UserService;
+import io.gravitee.am.service.exception.AbstractManagementException;
+import io.gravitee.am.service.exception.DomainAlreadyExistsException;
+import io.gravitee.am.service.exception.DomainDeleteMasterException;
+import io.gravitee.am.service.exception.DomainNotFoundException;
+import io.gravitee.am.service.exception.TechnicalManagementException;
 import io.gravitee.am.service.model.NewDomain;
 import io.gravitee.am.service.model.NewSystemScope;
+import io.gravitee.am.service.model.PatchDomain;
 import io.gravitee.am.service.model.UpdateDomain;
 import io.gravitee.am.service.model.UpdateLoginForm;
 import io.reactivex.Completable;
@@ -124,6 +136,7 @@ public class DomainServiceImpl implements DomainService {
                         domain.setName(newDomain.getName());
                         domain.setDescription(newDomain.getDescription());
                         domain.setEnabled(false);
+                        domain.setOidc(OIDCSettings.defaultSettings());
                         domain.setCreatedAt(new Date());
                         domain.setUpdatedAt(domain.getCreatedAt());
                         domain.setLastEvent(new Event(Type.DOMAIN, new Payload(id, id, Action.CREATE)));
@@ -161,6 +174,8 @@ public class DomainServiceImpl implements DomainService {
                     domain.setUpdatedAt(new Date());
                     domain.setLoginForm(oldDomain.getLoginForm());
                     domain.setLastEvent(new Event(Type.DOMAIN, new Payload(domainId, domainId, Action.UPDATE)));
+                    //As it is not managed by UpdateDomain, we keep old value
+                    domain.setOidc(oldDomain.getOidc());
 
                     return domainRepository.update(domain);
                 })
@@ -174,6 +189,25 @@ public class DomainServiceImpl implements DomainService {
                 });
     }
 
+    public Single<Domain> patch(String domainId, PatchDomain patchDomain) {
+        LOGGER.debug("Patching an existing domain ({}) with : {}",domainId, patchDomain);
+        return domainRepository.findById(domainId)
+                .switchIfEmpty(Maybe.error(new DomainNotFoundException(domainId)))
+                .flatMapSingle(oldDomain -> {
+                    Domain toPatch = patchDomain.patch(oldDomain);
+                    toPatch.setUpdatedAt(new Date());
+                    return domainRepository.update(toPatch);
+                })
+                .onErrorResumeNext(ex -> {
+                    if (ex instanceof AbstractManagementException) {
+                        return Single.error(ex);
+                    }
+
+                    LOGGER.error("An error occurs while trying to patch a domain", ex);
+                    return Single.error(new TechnicalManagementException("An error occurs while trying to patch a domain", ex));
+                });
+    }
+
     @Override
     public Single<Domain> reload(String domainId, Event event) {
         LOGGER.debug("Reload a domain: {}", domainId);
@@ -182,7 +216,6 @@ public class DomainServiceImpl implements DomainService {
                 .flatMapSingle(oldDomain -> {
                     oldDomain.setUpdatedAt(new Date());
                     oldDomain.setLastEvent(event);
-
                     return domainRepository.update(oldDomain);
                 })
                 .onErrorResumeNext(ex -> {
@@ -356,5 +389,38 @@ public class DomainServiceImpl implements DomainService {
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         domainName = pattern.matcher(nfdNormalizedString).replaceAll("");
         return domainName.toLowerCase().trim().replaceAll("\\s{1,}", "-");
+    }
+
+
+    @Override
+    public boolean isDynamicClientRegistrationEnabled(Domain domain) {
+        return domain!=null &&
+                domain.getOidc()!=null &&
+                domain.getOidc().getDynamicClientRegistration()!=null &&
+                domain.getOidc().getDynamicClientRegistration().isEnabled();
+    }
+
+    @Override
+    public boolean isRedirectUriLocalhostAllowed(Domain domain) {
+        return domain!=null &&
+                domain.getOidc()!=null &&
+                domain.getOidc().getDynamicClientRegistration()!=null &&
+                domain.getOidc().getDynamicClientRegistration().isAllowLocalhostRedirectUri();
+    }
+
+    @Override
+    public boolean isRedirectUriUnsecuredHttpSchemeAllowed(Domain domain) {
+        return domain!=null &&
+                domain.getOidc()!=null &&
+                domain.getOidc().getDynamicClientRegistration()!=null &&
+                domain.getOidc().getDynamicClientRegistration().isAllowHttpSchemeRedirectUri();
+    }
+
+    @Override
+    public boolean isRedirectUriWildcardAllowed(Domain domain) {
+        return domain!=null &&
+                domain.getOidc()!=null &&
+                domain.getOidc().getDynamicClientRegistration()!=null &&
+                domain.getOidc().getDynamicClientRegistration().isAllowWildCardRedirectUri();
     }
 }

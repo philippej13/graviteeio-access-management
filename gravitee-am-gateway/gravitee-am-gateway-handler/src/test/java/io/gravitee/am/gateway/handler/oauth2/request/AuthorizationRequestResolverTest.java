@@ -67,7 +67,7 @@ public class AuthorizationRequestResolverTest {
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
         authorizationRequest.setRedirectUri(redirectUri);
         Client client = new Client();
-        client.setScopes(Collections.singletonList(scope));
+        client.setScope(Collections.singletonList(scope));
 
         TestObserver<AuthorizationRequest> testObserver = authorizationRequestResolver.resolve(authorizationRequest, client, null).test();
         testObserver.assertComplete();
@@ -83,7 +83,7 @@ public class AuthorizationRequestResolverTest {
         authorizationRequest.setScopes(Collections.singleton(scope));
         authorizationRequest.setRedirectUri(redirectUri);
         Client client = new Client();
-        client.setScopes(Collections.singletonList("write"));
+        client.setScope(Collections.singletonList("write"));
 
         TestObserver<AuthorizationRequest> testObserver = authorizationRequestResolver.resolve(authorizationRequest, client, null).test();
         testObserver.assertNotComplete();
@@ -98,7 +98,7 @@ public class AuthorizationRequestResolverTest {
         authorizationRequest.setScopes(Collections.singleton(scope));
         authorizationRequest.setRedirectUri(redirectUri);
         Client client = new Client();
-        client.setScopes(Collections.singletonList("write"));
+        client.setScope(Collections.singletonList("write"));
 
         User user = new User();
         Role role = new Role();
@@ -120,7 +120,7 @@ public class AuthorizationRequestResolverTest {
         authorizationRequest.setScopes(new HashSet<>(Arrays.asList(scope, userScope)));
 
         Client client = new Client();
-        client.setScopes(Collections.singletonList(scope));
+        client.setScope(Collections.singletonList(scope));
         client.setEnhanceScopesWithUserPermissions(true);
 
         User user = new User();

@@ -27,6 +27,8 @@ public class ClientListItem {
 
     private String clientId;
 
+    private String clientName;
+
     private String domainId;
 
     private String domainName;
@@ -36,6 +38,8 @@ public class ClientListItem {
     private Date createdAt;
 
     private Date updatedAt;
+
+    private boolean dynamicClientRegistrationEnabled;
 
     public String getId() {
         return id;
@@ -51,6 +55,14 @@ public class ClientListItem {
 
     public void setClientId(String clientId) {
         this.clientId = clientId;
+    }
+
+    public String getClientName() {
+        return clientName;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
     }
 
     public String getDomainId() {
@@ -92,4 +104,13 @@ public class ClientListItem {
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    public boolean isDynamicClientRegistrationEnabled() {
+        return dynamicClientRegistrationEnabled;
+    }
+
+    public void setDynamicClientRegistrationEnabled(boolean dynamicClientRegistrationEnabled) {
+        this.dynamicClientRegistrationEnabled = dynamicClientRegistrationEnabled;
+    }
+
 }

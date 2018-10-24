@@ -15,7 +15,7 @@
  */
 package io.gravitee.am.gateway.handler.vertx.handler.oauth2.endpoint.authorization;
 
-import io.gravitee.am.gateway.handler.oauth2.client.ClientService;
+import io.gravitee.am.gateway.handler.oauth2.client.ClientSyncService;
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidRequestException;
 import io.gravitee.am.gateway.handler.oauth2.exception.RedirectMismatchException;
 import io.gravitee.am.gateway.handler.oauth2.exception.ServerErrorException;
@@ -41,10 +41,10 @@ import java.util.List;
 public class AuthorizationRequestParseClientHandler implements Handler<RoutingContext> {
 
     private static final String CLIENT_CONTEXT_KEY = "client";
-    private ClientService clientService;
+    private ClientSyncService clientSyncService;
 
-    public AuthorizationRequestParseClientHandler(ClientService clientService) {
-        this.clientService = clientService;
+    public AuthorizationRequestParseClientHandler(ClientSyncService clientSyncService) {
+        this.clientSyncService = clientSyncService;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class AuthorizationRequestParseClientHandler implements Handler<RoutingCo
     }
 
     private void authenticate(String clientId, Handler<AsyncResult<Client>> authHandler) {
-        clientService
+        clientSyncService
                 .findByClientId(clientId)
                 .subscribe(
                         client -> authHandler.handle(Future.succeededFuture(client)),
@@ -84,7 +84,7 @@ public class AuthorizationRequestParseClientHandler implements Handler<RoutingCo
 
     private void checkGrantTypes(Client client) {
         // Authorization endpoint implies that the client should at least have authorization_code ou implicit grant types.
-        List<String> authorizedGrantTypes = client.getAuthorizedGrantTypes();
+        List<String> authorizedGrantTypes = client.getGrantTypes();
         if (authorizedGrantTypes == null || authorizedGrantTypes.isEmpty()) {
             throw new UnauthorizedClientException("Client should at least have one authorized grand type");
         }

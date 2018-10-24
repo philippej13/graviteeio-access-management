@@ -16,7 +16,7 @@
 package io.gravitee.am.gateway.handler.vertx.endpoint;
 
 import io.gravitee.am.common.oauth2.ResponseType;
-import io.gravitee.am.gateway.handler.oauth2.client.ClientService;
+import io.gravitee.am.gateway.handler.oauth2.client.ClientSyncService;
 import io.gravitee.am.gateway.handler.oauth2.exception.AccessDeniedException;
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidScopeException;
 import io.gravitee.am.gateway.handler.oauth2.request.AuthorizationRequest;
@@ -70,7 +70,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
     private Domain domain;
 
     @Mock
-    private ClientService clientService;
+    private ClientSyncService clientSyncService;
 
     @Mock
     private OpenIDDiscoveryService openIDDiscoveryService;
@@ -102,7 +102,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
                 .handler(sessionHandler);
         router.route(HttpMethod.GET, "/oauth/authorize")
                 .handler(new AuthorizationRequestParseRequiredParametersHandler(openIDDiscoveryService))
-                .handler(new AuthorizationRequestParseClientHandler(clientService))
+                .handler(new AuthorizationRequestParseClientHandler(clientSyncService))
                 .handler(new AuthorizationRequestParseParametersHandler(domain))
                 .handler(authorizationEndpointHandler);
         router.route()
@@ -116,7 +116,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -137,7 +137,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -158,7 +158,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             routingContext.put(CLIENT_CONTEXT_KEY, client);
@@ -181,7 +181,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         router.route().order(-1).handler(routingContext -> {
@@ -189,7 +189,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             routingContext.next();
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.error(new InvalidScopeException("Invalid scope(s): unknown")));
 
         testRequest(
@@ -209,13 +209,13 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
         authorizationRequest.setApproved(true);
         authorizationRequest.setResponseType(OAuth2Constants.CODE);
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -234,7 +234,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Arrays.asList("http://redirect1", "http://redirect2"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -242,7 +242,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         authorizationRequest.setResponseType(OAuth2Constants.CODE);
 
         when(domain.getPath()).thenReturn("test");
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -261,7 +261,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/authorize/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -269,7 +269,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         authorizationRequest.setResponseType(OAuth2Constants.CODE);
         authorizationRequest.setRedirectUri("http://localhost:9999/wrong/callback");
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -288,10 +288,10 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -315,7 +315,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             routingContext.put(CLIENT_CONTEXT_KEY, new Client());
@@ -360,7 +360,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             routingContext.next();
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.just(authorizationResponse));
 
         testRequest(
@@ -398,7 +398,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             routingContext.next();
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.just(authorizationResponse));
 
         testRequest(
@@ -420,7 +420,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             routingContext.put(CLIENT_CONTEXT_KEY, client);
@@ -444,13 +444,13 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
         authorizationRequest.setApproved(false);
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             io.gravitee.am.model.User endUser = new io.gravitee.am.model.User();
@@ -477,13 +477,13 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
         authorizationRequest.setApproved(false);
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             io.gravitee.am.model.User endUser = new io.gravitee.am.model.User();
@@ -529,7 +529,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             routingContext.next();
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.just(authorizationResponse));
 
 
@@ -553,7 +553,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             routingContext.put(CLIENT_CONTEXT_KEY, client);
@@ -579,7 +579,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             routingContext.put(CLIENT_CONTEXT_KEY, client);
@@ -605,7 +605,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         client.setClientId("client-id");
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             routingContext.put(CLIENT_CONTEXT_KEY, client);
@@ -645,7 +645,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             routingContext.next();
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.just(authorizationResponse));
 
         testRequest(
@@ -685,7 +685,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             }
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.just(authorizationResponse));
 
         testRequest(
@@ -705,10 +705,10 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         router.route().order(-1).handler(routingContext -> {
             routingContext.setUser(new User(new io.gravitee.am.gateway.handler.vertx.auth.user.User(new io.gravitee.am.model.User())));
@@ -729,7 +729,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
 
     @Test
     public void shouldNotInvokeAuthorizationEndpoint_invalidClient() throws Exception {
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.empty());
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.empty());
 
         testRequest(
                 HttpMethod.GET,
@@ -748,10 +748,10 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -770,10 +770,10 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
 
         testRequest(
                 HttpMethod.GET,
@@ -827,7 +827,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -851,7 +851,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             routingContext.next();
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.just(authorizationResponse));
 
         testRequest(
@@ -870,7 +870,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScopes(Collections.singletonList("read"));
+        client.setScope(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -894,7 +894,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
             routingContext.next();
         });
 
-        when(clientService.findByClientId("client-id")).thenReturn(Maybe.just(client));
+        when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
         when(flow.run(any(), any(), any())).thenReturn(Single.just(authorizationResponse));
 
         testRequest(

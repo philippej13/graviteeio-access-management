@@ -86,8 +86,8 @@ public class ScopeUpgrader implements Upgrader, Ordered {
         return clientService.findByDomain(domain.getId())
                 .filter(clients -> clients != null)
                 .flatMapObservable(clients -> Observable.fromIterable(clients))
-                .filter(client -> client.getScopes() != null)
-                .flatMap(client -> Observable.fromIterable(client.getScopes()))
+                .filter(client -> client.getScope() != null)
+                .flatMap(client -> Observable.fromIterable(client.getScope()))
                 .flatMapSingle(scope -> createScope(domain.getId(), scope))
                 .toList();
     }

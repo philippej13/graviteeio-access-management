@@ -15,12 +15,14 @@
  */
 package io.gravitee.am.gateway.handler.oauth2.token.impl;
 
+import com.google.common.base.Strings;
 import io.gravitee.am.common.jwt.Claims;
 import io.gravitee.am.common.jwt.JWT;
 import io.gravitee.am.common.jwt.exception.JwtException;
 import io.gravitee.am.gateway.handler.jwt.JwtService;
-import io.gravitee.am.gateway.handler.oauth2.client.ClientService;
+import io.gravitee.am.gateway.handler.oauth2.client.ClientSyncService;
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidGrantException;
+import io.gravitee.am.gateway.handler.oauth2.exception.InvalidRequestException;
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidTokenException;
 import io.gravitee.am.gateway.handler.oauth2.request.OAuth2Request;
 import io.gravitee.am.gateway.handler.oauth2.request.TokenRequest;
@@ -33,11 +35,13 @@ import io.gravitee.am.model.Client;
 import io.gravitee.am.model.User;
 import io.gravitee.am.repository.oauth2.api.AccessTokenRepository;
 import io.gravitee.am.repository.oauth2.api.RefreshTokenRepository;
+import io.gravitee.common.http.HttpHeaders;
 import io.gravitee.common.util.MultiValueMap;
 import io.gravitee.common.utils.UUID;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
+import io.vertx.reactivex.ext.web.RoutingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -71,7 +75,7 @@ public class TokenServiceImpl implements TokenService {
     private JwtService jwtService;
 
     @Autowired
-    private ClientService clientService;
+    private ClientSyncService clientSyncService;
 
     @Override
     public Maybe<Token> getAccessToken(String token, Client client) {
@@ -101,7 +105,7 @@ public class TokenServiceImpl implements TokenService {
     public Maybe<Token> introspect(String token) {
         // any client can introspect a token, we first need to decode the token to get the client's certificate to verify the token
         return jwtService.decode(token)
-                .flatMapMaybe(jwt -> clientService.findByDomainAndClientId(jwt.getDomain(), jwt.getAud()))
+                .flatMapMaybe(jwt -> clientSyncService.findByDomainAndClientId(jwt.getDomain(), jwt.getAud()))
                 .switchIfEmpty(Maybe.error(new InvalidTokenException("Invalid or unknown client for this token")))
                 .flatMap(client -> getAccessToken(token, client));
     }
@@ -153,6 +157,55 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Completable deleteRefreshToken(String refreshToken) {
         return refreshTokenRepository.delete(refreshToken);
+    }
+
+    /**
+     * Respect https://tools.ietf.org/html/rfc6750#section-2 by extracting first from header, then parameter.
+     * @param context RoutingContext
+     * @param isEndUserToken true if extracted token represent an end user, false if represent an application
+     * @return AccessToken
+     */
+    @Override
+    public Maybe<Token> extractAccessToken(RoutingContext context, boolean isEndUserToken) {
+        return this.extractAccessTokenFromRequest(context)
+                .flatMap(token -> jwtService.decode(token)
+                        .flatMapMaybe(jwt -> clientSyncService.findByClientId(jwt.getAud()))
+                        .switchIfEmpty(Maybe.error(new InvalidTokenException("Invalid or unknown client for this token")))
+                        .flatMap(client ->
+                                this.getAccessToken(token,client)
+                                .flatMap(accessToken -> {
+                                    if(isEndUserToken && accessToken.getSubject().equals(client.getClientId())) {
+                                        //Token for end user must not contain clientId as subject
+                                        return Maybe.error(new InvalidRequestException("The access token was not issued for an End-User"));
+                                    }
+                                    else if(!isEndUserToken && !accessToken.getSubject().equals(client.getClientId())) {
+                                        //Token for application must contain clientId as subject
+                                        return Maybe.error(new InvalidTokenException("The access token was not issued for a Client"));
+                                    }
+                                    return Maybe.just(accessToken);
+                                })
+                        )
+                );
+    }
+
+    private Maybe<String> extractAccessTokenFromRequest(RoutingContext context) {
+        //Extract first from Authorization Header
+        final String authorization = context.request().getHeader(HttpHeaders.AUTHORIZATION);
+        if(authorization!=null) {
+            if(!authorization.trim().startsWith(AccessToken.BEARER_TYPE+" ")) {
+                return Maybe.error(new InvalidRequestException("The access token must be sent using the Authorization header with as value \"Bearer xxxx\""));
+            }
+
+            return Maybe.just(authorization.replaceFirst(AccessToken.BEARER_TYPE+" ",""));
+        }
+
+        //Extract from query parameter.
+        final String accessToken = context.request().getParam(AccessToken.ACCESS_TOKEN);
+        if(!Strings.isNullOrEmpty(accessToken)) {
+            return Maybe.just(accessToken);
+        }
+
+        return Maybe.error(new InvalidRequestException("An access token is required"));
     }
 
     /**

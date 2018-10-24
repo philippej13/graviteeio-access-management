@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
@@ -62,6 +63,7 @@ public class ObjectMapperResolver implements ContextResolver<ObjectMapper> {
         });
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         mapper.registerModule(module);
+        mapper.registerModule(new Jdk8Module());
     }
 
     @Override

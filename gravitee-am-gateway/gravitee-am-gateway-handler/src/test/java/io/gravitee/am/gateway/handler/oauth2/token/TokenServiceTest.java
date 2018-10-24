@@ -17,7 +17,10 @@ package io.gravitee.am.gateway.handler.oauth2.token;
 
 import io.gravitee.am.common.jwt.JWT;
 import io.gravitee.am.gateway.handler.jwt.JwtService;
+import io.gravitee.am.gateway.handler.oauth2.client.ClientSyncService;
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidGrantException;
+import io.gravitee.am.gateway.handler.oauth2.exception.InvalidRequestException;
+import io.gravitee.am.gateway.handler.oauth2.exception.InvalidTokenException;
 import io.gravitee.am.gateway.handler.oauth2.request.OAuth2Request;
 import io.gravitee.am.gateway.handler.oauth2.request.TokenRequest;
 import io.gravitee.am.gateway.handler.oauth2.token.impl.AccessToken;
@@ -31,11 +34,14 @@ import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import org.junit.Assert;
+import io.vertx.reactivex.core.http.HttpServerRequest;
+import io.vertx.reactivex.ext.web.RoutingContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Date;
@@ -64,6 +70,9 @@ public class TokenServiceTest {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private ClientSyncService clientSyncService;
 
     @Test
     public void shouldCreate() {
@@ -219,5 +228,117 @@ public class TokenServiceTest {
         verify(refreshTokenRepository, times(1)).findByToken(any());
         verify(refreshTokenRepository, never()).delete(anyString());
         verify(accessTokenRepository, never()).create(any());
+    }
+
+    @Test
+    public void extractAccessToken_noBearer() {
+        HttpServerRequest request = Mockito.mock(HttpServerRequest.class);
+        RoutingContext context = Mockito.mock(RoutingContext.class);
+
+        when(context.request()).thenReturn(request);
+        when(request.getHeader(eq("Authorization"))).thenReturn(null);
+        when(request.getParam(any())).thenReturn(null);
+
+        TestObserver testObserver = tokenService.extractAccessToken(context,false).test();
+        testObserver.assertNotComplete();
+        testObserver.assertError(InvalidRequestException.class);
+    }
+
+    @Test
+    public void extractAccessToken_badHeaderFormat() {
+        HttpServerRequest request = Mockito.mock(HttpServerRequest.class);
+        RoutingContext context = Mockito.mock(RoutingContext.class);
+
+        when(context.request()).thenReturn(request);
+        when(request.getHeader(eq("Authorization"))).thenReturn("NotBearer eyxxx");
+
+        TestObserver testObserver = tokenService.extractAccessToken(context,false).test();
+        testObserver.assertNotComplete();
+        testObserver.assertError(InvalidRequestException.class);
+    }
+
+    @Test
+    public void extractAccessToken_noMatchingClient() {
+        HttpServerRequest request = Mockito.mock(HttpServerRequest.class);
+        RoutingContext context = Mockito.mock(RoutingContext.class);
+        JWT jwt = Mockito.mock(JWT.class);
+
+        when(context.request()).thenReturn(request);
+        when(request.getHeader(eq("Authorization"))).thenReturn(null);
+        when(request.getParam(eq("access_token"))).thenReturn("eyxxx");
+        when(jwtService.decode(any())).thenReturn(Single.just(jwt));
+        when(jwt.getAud()).thenReturn("");
+        when(clientSyncService.findByClientId(any())).thenReturn(Maybe.empty());
+
+        TestObserver testObserver = tokenService.extractAccessToken(context,false).test();
+        testObserver.assertNotComplete();
+        testObserver.assertError(InvalidTokenException.class);
+    }
+
+    @Test
+    public void extractAccessToken_notEndUser() {
+        HttpServerRequest request = Mockito.mock(HttpServerRequest.class);
+        RoutingContext context = Mockito.mock(RoutingContext.class);
+        JWT jwt = Mockito.mock(JWT.class);
+        Client client = Mockito.mock(Client.class);
+
+        when(context.request()).thenReturn(request);
+        when(request.getHeader(eq("Authorization"))).thenReturn("Bearer eyxxx");
+        when(jwtService.decode(any())).thenReturn(Single.just(jwt));
+        when(jwt.getAud()).thenReturn("");
+        when(clientSyncService.findByClientId(any())).thenReturn(Maybe.just(client));
+        when(jwtService.decodeAndVerify(any(),any())).thenReturn(Single.just(jwt));
+        when(accessTokenRepository.findByToken(any())).thenReturn(Maybe.just(new io.gravitee.am.repository.oauth2.model.AccessToken()));
+        when(jwt.getSub()).thenReturn("anApplicationId");
+        when(client.getClientId()).thenReturn("anApplicationId");
+
+        TestObserver testObserver = tokenService.extractAccessToken(context,true).test();
+        testObserver.assertNotComplete();
+        testObserver.assertError(InvalidRequestException.class);
+    }
+
+    @Test
+    public void extractAccessToken_notEndApplication() {
+        HttpServerRequest request = Mockito.mock(HttpServerRequest.class);
+        RoutingContext context = Mockito.mock(RoutingContext.class);
+        JWT jwt = Mockito.mock(JWT.class);
+        Client client = Mockito.mock(Client.class);
+
+        when(context.request()).thenReturn(request);
+        when(request.getHeader(eq("Authorization"))).thenReturn("Bearer eyxxx");
+        when(jwtService.decode(any())).thenReturn(Single.just(jwt));
+        when(jwt.getAud()).thenReturn("");
+        when(clientSyncService.findByClientId(any())).thenReturn(Maybe.just(client));
+        when(jwtService.decodeAndVerify(any(),any())).thenReturn(Single.just(jwt));
+        when(accessTokenRepository.findByToken(any())).thenReturn(Maybe.just(new io.gravitee.am.repository.oauth2.model.AccessToken()));
+        when(jwt.getSub()).thenReturn("notAnApplicationSubject");
+        when(client.getClientId()).thenReturn("anApplicationId");
+
+        TestObserver testObserver = tokenService.extractAccessToken(context,false).test();
+        testObserver.assertNotComplete();
+        testObserver.assertError(InvalidTokenException.class);
+    }
+
+    @Test
+    public void extractAccessToken_ok() {
+        HttpServerRequest request = Mockito.mock(HttpServerRequest.class);
+        RoutingContext context = Mockito.mock(RoutingContext.class);
+        JWT jwt = Mockito.mock(JWT.class);
+        Client client = Mockito.mock(Client.class);
+
+        when(context.request()).thenReturn(request);
+        when(request.getHeader(eq("Authorization"))).thenReturn("Bearer eyxxx");
+        when(jwtService.decode(any())).thenReturn(Single.just(jwt));
+        when(jwt.getAud()).thenReturn("");
+        when(clientSyncService.findByClientId(any())).thenReturn(Maybe.just(client));
+        when(jwtService.decodeAndVerify(any(),any())).thenReturn(Single.just(jwt));
+        when(accessTokenRepository.findByToken(any())).thenReturn(Maybe.just(new io.gravitee.am.repository.oauth2.model.AccessToken()));
+        when(jwt.getSub()).thenReturn("anApplicationId");
+        when(client.getClientId()).thenReturn("anApplicationId");
+
+        TestObserver testObserver = tokenService.extractAccessToken(context,false).test();
+        testObserver.assertComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertValue(at -> ((AccessToken)at).getSubject().equals("anApplicationId"));
     }
 }

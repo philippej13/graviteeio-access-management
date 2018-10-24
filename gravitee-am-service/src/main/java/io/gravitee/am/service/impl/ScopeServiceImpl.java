@@ -21,8 +21,18 @@ import io.gravitee.am.repository.oauth2.api.ScopeApprovalRepository;
 import io.gravitee.am.service.ClientService;
 import io.gravitee.am.service.RoleService;
 import io.gravitee.am.service.ScopeService;
-import io.gravitee.am.service.exception.*;
-import io.gravitee.am.service.model.*;
+import io.gravitee.am.service.exception.AbstractManagementException;
+import io.gravitee.am.service.exception.InvalidClientMetadataException;
+import io.gravitee.am.service.exception.ScopeAlreadyExistsException;
+import io.gravitee.am.service.exception.ScopeNotFoundException;
+import io.gravitee.am.service.exception.SystemScopeDeleteException;
+import io.gravitee.am.service.exception.TechnicalManagementException;
+import io.gravitee.am.service.model.NewScope;
+import io.gravitee.am.service.model.NewSystemScope;
+import io.gravitee.am.service.model.UpdateClient;
+import io.gravitee.am.service.model.UpdateRole;
+import io.gravitee.am.service.model.UpdateScope;
+import io.gravitee.am.service.model.UpdateSystemScope;
 import io.gravitee.common.utils.UUID;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -34,12 +44,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
+ * @author Alexandre FARIA (lusoalex at github.com)
  * @author GraviteeSource Team
  */
 @Component
@@ -210,19 +222,20 @@ public class ScopeServiceImpl implements ScopeService {
                                         // 2_ Remove scopes from client
                                         clientService.findByDomain(scope.getDomain())
                                                 .flatMapObservable(clients -> Observable.fromIterable(clients.stream()
-                                                        .filter(client -> client.getScopes().contains(scope.getKey()))
+                                                        .filter(client -> client.getScope().contains(scope.getKey()))
                                                         .collect(Collectors.toList())))
                                                 .flatMapSingle(client -> {
                                                     // Remove scope from client
-                                                    client.getScopes().remove(scope.getKey());
+                                                    client.getScope().remove(scope.getKey());
 
                                                     UpdateClient updateClient = new UpdateClient();
+                                                    updateClient.setClientName(client.getClientName());
                                                     updateClient.setAutoApproveScopes(client.getAutoApproveScopes());
-                                                    updateClient.setScopes(client.getScopes());
+                                                    updateClient.setScope(client.getScope());
                                                     updateClient.setRefreshTokenValiditySeconds(client.getRefreshTokenValiditySeconds());
                                                     updateClient.setRedirectUris(client.getRedirectUris());
                                                     updateClient.setAccessTokenValiditySeconds(client.getAccessTokenValiditySeconds());
-                                                    updateClient.setAuthorizedGrantTypes(client.getAuthorizedGrantTypes());
+                                                    updateClient.setGrantTypes(client.getGrantTypes());
                                                     updateClient.setCertificate(client.getCertificate());
                                                     updateClient.setEnabled(client.isEnabled());
                                                     updateClient.setEnhanceScopesWithUserPermissions(client.isEnhanceScopesWithUserPermissions());
@@ -258,4 +271,32 @@ public class ScopeServiceImpl implements ScopeService {
                             String.format("An error occurs while trying to find scopes by domain: %s", domain), ex));
                 });
     }
+
+    /**
+     * Throw InvalidClientMetadataException if null or empty, or contains unknown scope.
+     * @param scopes Array of scope to validate.
+     */
+    @Override
+    public Single<Boolean> validateScope(String domain, List<String> scopes) {
+        if(scopes==null || scopes.size()==0) {
+            return Single.just(true);//nothing to do...
+        }
+
+        return findByDomain(domain)
+                .map(domainSet -> domainSet.stream().map(scope -> scope.getKey()).collect(Collectors.toSet()))
+                .flatMap(domainScopes -> this.validateScope(domainScopes,scopes));
+    }
+
+    private Single<Boolean> validateScope(Set<String> domainScopes, List<String> scopes) {
+
+        for(String scope:scopes) {
+            if(!domainScopes.contains(scope)) {
+                return Single.error(new InvalidClientMetadataException("scope "+scope+" is not valid."));
+            }
+        }
+
+        return Single.just(true);
+    }
+
+
 }

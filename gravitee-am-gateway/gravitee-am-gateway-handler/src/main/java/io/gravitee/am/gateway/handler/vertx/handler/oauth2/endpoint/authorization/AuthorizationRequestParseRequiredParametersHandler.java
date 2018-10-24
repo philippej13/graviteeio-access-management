@@ -21,13 +21,9 @@ import io.gravitee.am.gateway.handler.oauth2.exception.UnsupportedResponseTypeEx
 import io.gravitee.am.gateway.handler.oauth2.utils.OAuth2Constants;
 import io.gravitee.am.gateway.handler.oauth2.utils.OIDCParameters;
 import io.gravitee.am.gateway.handler.oidc.discovery.OpenIDDiscoveryService;
-import io.gravitee.am.gateway.handler.oidc.request.ClaimsRequestResolver;
-import io.gravitee.am.model.Domain;
 import io.vertx.core.Handler;
 import io.vertx.reactivex.core.MultiMap;
 import io.vertx.reactivex.ext.web.RoutingContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;

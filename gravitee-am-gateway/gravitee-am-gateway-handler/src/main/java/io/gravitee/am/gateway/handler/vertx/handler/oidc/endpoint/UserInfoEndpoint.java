@@ -23,7 +23,7 @@ import io.gravitee.am.gateway.handler.oauth2.exception.InvalidTokenException;
 import io.gravitee.am.gateway.handler.oauth2.token.Token;
 import io.gravitee.am.gateway.handler.oauth2.token.impl.AccessToken;
 import io.gravitee.am.gateway.handler.oidc.request.ClaimsRequest;
-import io.gravitee.am.gateway.service.UserService;
+import io.gravitee.am.service.UserService;
 import io.gravitee.common.http.HttpHeaders;
 import io.gravitee.common.http.MediaType;
 import io.vertx.core.Handler;
@@ -47,9 +47,6 @@ import java.util.stream.Collectors;
 public class UserInfoEndpoint implements Handler<RoutingContext> {
 
     private UserService userService;
-
-    public UserInfoEndpoint() {
-    }
 
     public UserInfoEndpoint(UserService userService) {
         this.userService = userService;

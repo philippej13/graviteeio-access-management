@@ -17,6 +17,7 @@ package io.gravitee.am.model;
 
 import io.gravitee.am.model.common.event.Event;
 import io.gravitee.am.model.login.LoginForm;
+import io.gravitee.am.model.oidc.OIDCSettings;
 
 import java.util.Date;
 import java.util.Set;
@@ -74,6 +75,8 @@ public class Domain {
     private Set<String> oauth2Identities;
 
     private Event lastEvent;
+
+    private OIDCSettings oidc;
 
     public String getId() {
         return id;
@@ -169,6 +172,14 @@ public class Domain {
 
     public void setLastEvent(Event lastEvent) {
         this.lastEvent = lastEvent;
+    }
+
+    public OIDCSettings getOidc() {
+        return oidc!=null?oidc:OIDCSettings.defaultSettings();
+    }
+
+    public void setOidc(OIDCSettings oidc) {
+        this.oidc = oidc;
     }
 
     @Override

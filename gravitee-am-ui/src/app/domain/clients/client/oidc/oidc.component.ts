@@ -19,6 +19,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SnackbarService } from "../../../../services/snackbar.service";
 import { DialogService } from "../../../../services/dialog.service";
 import { ClientService } from "../../../../services/client.service";
+import { DomainService } from "../../../../services/domain.service";
 
 @Component({
   selector: 'app-oidc',
@@ -31,14 +32,23 @@ export class ClientOIDCComponent implements OnInit {
   claims: any = [];
   editing = {};
   formChanged: boolean = false;
+  domainDcrDisabled = false;
+  enableDcrToolTip = true;
 
   constructor(private route: ActivatedRoute, private dialog: MatDialog, private clientService: ClientService,
-              private snackbarService: SnackbarService, private dialogService: DialogService) { }
+              private snackbarService: SnackbarService, private dialogService: DialogService, private domainService: DomainService) { }
 
   ngOnInit() {
     this.domainId = this.route.snapshot.parent.parent.params['domainId'];
     this.client = this.route.snapshot.parent.data['client'];
     this.setClaims(this.client.idTokenCustomClaims);
+    this.domainService.get(this.domainId).map(res => res.json()).subscribe(data =>  {
+      this.domainDcrDisabled=!data.oidc.dynamicClientRegistration.enabled;
+      this.enableDcrToolTip = data.oidc.dynamicClientRegistration.enabled;
+      console.log(data);
+      console.log(this.domainDcrDisabled);
+      console.log(this.enableDcrToolTip);
+    });
   }
 
   setClaims(claims) {
@@ -80,6 +90,11 @@ export class ClientOIDCComponent implements OnInit {
       this.claims = [...this.claims];
       this.update("Claim updated");
     }
+  }
+
+  enableDynamicClientRegistration(event) {
+    this.client.dynamicClientRegistrationEnabled = event.checked;
+    this.formChanged = true;
   }
 
   update(message: string) {

@@ -33,6 +33,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Arrays;
+
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,6 +62,7 @@ public class RefreshTokenGranterTest {
 
         Client client = new Client();
         client.setClientId("my-client-id");
+        client.setGrantTypes(Arrays.asList(new String[]{"refresh_token"}));
 
         OAuth2Request oAuth2Request = new OAuth2Request();
         oAuth2Request.setClientId("my-client-id");
@@ -101,6 +104,7 @@ public class RefreshTokenGranterTest {
 
         Client client = new Client();
         client.setClientId("my-client-id");
+        client.setGrantTypes(Arrays.asList(new String[]{"refresh_token"}));
 
         when(tokenRequest.getClientId()).thenReturn("my-client-id");
         when(tokenRequest.getGrantType()).thenReturn("refresh_token");

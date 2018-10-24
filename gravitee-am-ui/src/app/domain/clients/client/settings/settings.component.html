@@ -38,9 +38,14 @@
       <button mat-icon-button matTooltip="Copy Client Secret" ngxClipboard [cbContent]="client.clientSecret" (cbOnSuccess)="valueCopied('Client Secret copied to the clipboard')" (click)="$event.preventDefault();"><mat-icon>content_copy</mat-icon></button>
     </div>
 
+    <mat-form-field fxFlex>
+      <input matInput type="text" placeholder="Client name" name="client_name" [(ngModel)]="client.clientName">
+      <mat-hint>The client human readable name.</mat-hint>
+    </mat-form-field>
+
     <h4 style="margin-bottom: 5px;">Grant types</h4>
     <mat-hint style="font-size: 75%; margin-bottom: 20px;">OAuth 2.0 grant types used by the client to obtain an access token. Each grant type is specific to a type of application.</mat-hint>
-    <mat-checkbox *ngFor="let grantType of grantTypes"
+    <mat-checkbox *ngFor="let grantType of grantTypesList"
                  name="grantTypes"
                  value="{{grantType.value}}"
                  [checked]="grantType.checked"
@@ -78,25 +83,25 @@
     <br>
 
     <h4 style="margin-bottom: 5px;">Scopes</h4>
-    <mat-hint style="font-size: 75%; margin-bottom: 20px;">Let you limit client's access to protected resources/APIs.</mat-hint>
-    <mat-form-field>
-      <mat-chip-list style="margin-top: 10px; margin-bottom: 10px;" #chipListPermissions>
-        <mat-chip *ngFor="let scope of selectedScopes" color="accent"
-                  selected="true" (remove)="removeScope(scope)">
-          <mat-icon style="vertical-align:middle;">donut_large</mat-icon>
-          &nbsp;<span>{{scope.key}}</span>&nbsp;|&nbsp;<small>{{scope.name}}</small>
-          <mat-icon matChipRemove>cancel</mat-icon>
-        </mat-chip>
-        <input matInput
-               placeholder="Permissions"
-               aria-label="Permissions"
-               [matAutocomplete]="auto"
-               [matChipInputFor]="chipListPermissions"
-               #chipInput>
-      </mat-chip-list>
+      <mat-hint style="font-size: 75%; margin-bottom: 20px;">Let you limit client's access to protected resources/APIs.</mat-hint>
+      <mat-form-field>
+        <mat-chip-list style="margin-top: 10px; margin-bottom: 10px;" #chipListPermissions>
+          <mat-chip *ngFor="let scope of selectedScopes" color="accent"
+                    selected="true" (remove)="removeScope(scope)">
+            <mat-icon style="vertical-align:middle;">donut_large</mat-icon>
+            &nbsp;<span>{{scope.key}}</span>&nbsp;|&nbsp;<small>{{scope.name}}</small>
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <input matInput
+                 placeholder="Permissions"
+                 aria-label="Permissions"
+                 [matAutocomplete]="auto"
+                 [matChipInputFor]="chipListPermissions"
+                 #chipInput>
+        </mat-chip-list>
 
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addScope($event)">
-        <mat-option *ngFor="let scope of scopes" [value]="scope.key">
+        <mat-option *ngFor="let scope of scopeList" [value]="scope.key">
           <mat-icon style="vertical-align:middle;">donut_large</mat-icon>
           <span>{{ scope.key }}</span> | <small>{{scope.name}}</small>
         </mat-option>

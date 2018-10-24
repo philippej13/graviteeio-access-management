@@ -17,10 +17,7 @@ package io.gravitee.am.service;
 
 import io.gravitee.am.model.Client;
 import io.gravitee.am.model.common.Page;
-import io.gravitee.am.service.model.NewClient;
-import io.gravitee.am.service.model.TopClient;
-import io.gravitee.am.service.model.TotalClient;
-import io.gravitee.am.service.model.UpdateClient;
+import io.gravitee.am.service.model.*;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
@@ -30,6 +27,7 @@ import java.util.Set;
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
+ * @author Alexandre FARIA (lusoalex at github.com)
  * @author GraviteeSource Team
  */
 public interface ClientService {
@@ -44,7 +42,11 @@ public interface ClientService {
 
     Single<Client> create(String domain, NewClient newClient);
 
+    Single<Client> create(String domain, Client client);
+
     Single<Client> update(String domain, String id, UpdateClient updateClient);
+
+    Single<Client> patch(String domain, String id, PatchClient patchClient);
 
     Single<Set<Client>> findByIdentityProvider(String identityProvider);
 

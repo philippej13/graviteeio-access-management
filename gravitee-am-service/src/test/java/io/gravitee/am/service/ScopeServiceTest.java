@@ -21,6 +21,7 @@ import io.gravitee.am.model.oauth2.Scope;
 import io.gravitee.am.repository.exceptions.TechnicalException;
 import io.gravitee.am.repository.management.api.ScopeRepository;
 import io.gravitee.am.repository.oauth2.api.ScopeApprovalRepository;
+import io.gravitee.am.service.exception.InvalidClientMetadataException;
 import io.gravitee.am.service.exception.ScopeAlreadyExistsException;
 import io.gravitee.am.service.exception.ScopeNotFoundException;
 import io.gravitee.am.service.exception.SystemScopeDeleteException;
@@ -33,6 +34,7 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
@@ -52,6 +54,7 @@ import static org.mockito.Mockito.*;
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
  * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
+ * @author Alexandre FARIA (lusoalex at github.com)
  * @author GraviteeSource Team
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -276,7 +279,7 @@ public class ScopeServiceTest {
 
         Client client = mock(Client.class);
         when(client.getId()).thenReturn("client-1");
-        when(client.getScopes()).thenReturn(new LinkedList<>(Arrays.asList("my-scope")));
+        when(client.getScope()).thenReturn(new LinkedList<>(Arrays.asList("my-scope")));
 
         when(roleService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(role)));
         when(clientService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(client)));
@@ -311,4 +314,27 @@ public class ScopeServiceTest {
         testObserver.assertNotComplete();
     }
 
+    @Test
+    public void validateScope_nullList() {
+        TestObserver<Boolean> testObserver = scopeService.validateScope(DOMAIN,null).test();
+        testObserver.assertComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertValue(isValid -> isValid);
+    }
+
+    @Test
+    public void validateScope_unknownScope() {
+        when(scopeRepository.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(new Scope("valid"))));
+        TestObserver<Boolean> testObserver = scopeService.validateScope(DOMAIN,Arrays.asList("unknown")).test();
+        testObserver.assertError(InvalidClientMetadataException.class);
+    }
+
+    @Test
+    public void validateScope_validScope() {
+        when(scopeRepository.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(new Scope("valid"))));
+        TestObserver<Boolean> testObserver = scopeService.validateScope(DOMAIN,Arrays.asList("valid")).test();
+        testObserver.assertComplete();
+        testObserver.assertNoErrors();
+        testObserver.assertValue(isValid -> isValid);
+    }
 }

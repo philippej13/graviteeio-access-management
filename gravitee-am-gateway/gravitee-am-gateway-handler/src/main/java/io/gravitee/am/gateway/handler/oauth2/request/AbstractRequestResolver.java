@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static io.gravitee.am.common.oidc.Scope.SCOPE_DELIMITER;
+
 /**
  * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
  * @author GraviteeSource Team
@@ -43,7 +45,7 @@ public abstract class AbstractRequestResolver<R extends BaseRequest> {
      * @return the oauth 2.0 request
      */
     protected Single<R> resolveAuthorizedScopes(R request, Client client, User endUser) {
-        final List<String> clientScopes = client.getScopes();
+        final List<String> clientScopes = client.getScope();
         final Set<String> requestScopes = request.getScopes();
         Set<String> clientResolvedScopes = new HashSet<>();
         Set<String> resolvedScopes = new HashSet<>();
@@ -95,11 +97,11 @@ public abstract class AbstractRequestResolver<R extends BaseRequest> {
         }
 
         if (!invalidScopes.isEmpty()) {
-            return Single.error(new InvalidScopeException("Invalid scope(s): " + invalidScopes.stream().collect(Collectors.joining(" "))));
+            return Single.error(new InvalidScopeException("Invalid scope(s): " + invalidScopes.stream().collect(Collectors.joining(SCOPE_DELIMITER))));
         }
 
         if (resolvedScopes.isEmpty() && (requestScopes != null && !requestScopes.isEmpty())) {
-            return Single.error(new InvalidScopeException("Invalid scope(s): " + requestScopes.stream().collect(Collectors.joining(" "))));
+            return Single.error(new InvalidScopeException("Invalid scope(s): " + requestScopes.stream().collect(Collectors.joining(SCOPE_DELIMITER))));
         }
 
         // set resolved scopes

@@ -18,6 +18,7 @@ package io.gravitee.am.management.handlers.management.api.resources;
 import io.gravitee.am.model.Domain;
 import io.gravitee.am.service.DomainService;
 import io.gravitee.am.service.exception.DomainNotFoundException;
+import io.gravitee.am.service.model.PatchDomain;
 import io.gravitee.am.service.model.UpdateDomain;
 import io.gravitee.common.http.MediaType;
 import io.reactivex.Maybe;
@@ -25,6 +26,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.jaxrs.PATCH;
 import org.glassfish.jersey.server.ManagedAsync;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -66,6 +68,7 @@ public class DomainResource extends AbstractResource {
                         error -> response.resume(error));
     }
 
+/*
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -78,6 +81,24 @@ public class DomainResource extends AbstractResource {
             @PathParam("domain") String domainId,
             @Suspended final AsyncResponse response) {
          domainService.update(domainId, domainToUpdate)
+                .subscribe(
+                        domain -> response.resume(Response.ok(domain).build()),
+                        error -> response.resume(error));
+    }
+*/
+
+    @PATCH
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Patch the security domain")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Domain successfully patched", response = Domain.class),
+            @ApiResponse(code = 500, message = "Internal server error")})
+    public void patch(
+            @ApiParam(name = "domain", required = true) @Valid @NotNull final PatchDomain domainToPatch,
+            @PathParam("domain") String domainId,
+            @Suspended final AsyncResponse response) {
+        domainService.patch(domainId, domainToPatch)
                 .subscribe(
                         domain -> response.resume(Response.ok(domain).build()),
                         error -> response.resume(error));

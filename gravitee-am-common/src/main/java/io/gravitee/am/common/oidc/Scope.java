@@ -43,6 +43,9 @@ public enum Scope {
     private final String name;
     private final List<String> claims;
 
+    //See https://tools.ietf.org/html/rfc6749#section-3.3
+    public final static String SCOPE_DELIMITER = " ";
+
     Scope(String name, List<String> claims) {
         this.name = name;
         this.claims = claims;

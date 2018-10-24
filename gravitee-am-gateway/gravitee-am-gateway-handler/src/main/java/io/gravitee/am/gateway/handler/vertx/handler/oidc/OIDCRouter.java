@@ -15,16 +15,20 @@
  */
 package io.gravitee.am.gateway.handler.vertx.handler.oidc;
 
-import io.gravitee.am.gateway.handler.jwt.JwtService;
-import io.gravitee.am.gateway.handler.oauth2.client.ClientService;
+import io.gravitee.am.gateway.handler.oauth2.client.ClientSyncService;
 import io.gravitee.am.gateway.handler.oauth2.token.TokenService;
+import io.gravitee.am.gateway.handler.oidc.clientregistration.DynamicClientRegistrationService;
 import io.gravitee.am.gateway.handler.oidc.discovery.OpenIDDiscoveryService;
 import io.gravitee.am.gateway.handler.oidc.jwk.JWKSetService;
+import io.gravitee.am.gateway.handler.vertx.handler.oidc.endpoint.DynamicClientRegistrationEndpoint;
 import io.gravitee.am.gateway.handler.vertx.handler.oidc.endpoint.ProviderConfigurationEndpoint;
 import io.gravitee.am.gateway.handler.vertx.handler.oidc.endpoint.ProviderJWKSetEndpoint;
 import io.gravitee.am.gateway.handler.vertx.handler.oidc.endpoint.UserInfoEndpoint;
+import io.gravitee.am.gateway.handler.vertx.handler.oidc.handler.DynamicClientRegistrationHandler;
 import io.gravitee.am.gateway.handler.vertx.handler.oidc.handler.UserInfoRequestParseHandler;
-import io.gravitee.am.gateway.service.UserService;
+import io.gravitee.am.model.Domain;
+import io.gravitee.am.service.ClientService;
+import io.gravitee.am.service.UserService;
 import io.gravitee.common.http.MediaType;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
@@ -52,6 +56,9 @@ public class OIDCRouter {
     private OpenIDDiscoveryService discoveryService;
 
     @Autowired
+    private DynamicClientRegistrationService dcrService;
+
+    @Autowired
     private JWKSetService jwkSetService;
 
     @Autowired
@@ -61,13 +68,16 @@ public class OIDCRouter {
     private UserService userService;
 
     @Autowired
-    private ClientService clientService;
-
-    @Autowired
-    private JwtService jwtService;
+    private ClientSyncService clientSyncService;
 
     @Autowired
     private Environment environment;
+
+    @Autowired
+    private ClientService clientService;
+
+    @Autowired
+    private Domain domain;
 
     @Autowired
     private Vertx vertx;
@@ -85,7 +95,7 @@ public class OIDCRouter {
 
         // UserInfo Endpoint
         Handler<RoutingContext> userInfoEndpoint = new UserInfoEndpoint(userService);
-        Handler<RoutingContext> userInfoRequestParseHandler = new UserInfoRequestParseHandler(tokenService, clientService, jwtService);
+        Handler<RoutingContext> userInfoRequestParseHandler = new UserInfoRequestParseHandler(tokenService);
         router.route("/userinfo").handler(CorsHandler.newInstance(corsHandler()));
         router
                 .route(HttpMethod.GET, "/userinfo")
@@ -103,6 +113,15 @@ public class OIDCRouter {
         router
                 .route(HttpMethod.GET, "/.well-known/jwks.json")
                 .handler(openIDProviderJWKSetEndpoint);
+
+        // Dynamic Client Registration
+        Handler<RoutingContext> dynamicClientRegistrationHandler = new DynamicClientRegistrationHandler(domain, tokenService, clientSyncService);
+        Handler<RoutingContext> dynamicClientRegistrationEndpoint = new DynamicClientRegistrationEndpoint(dcrService, clientService, clientSyncService);
+        router
+                .route(HttpMethod.POST, "/register")
+                .consumes(MediaType.APPLICATION_JSON)
+                .handler(dynamicClientRegistrationHandler)
+                .handler(dynamicClientRegistrationEndpoint);
 
         return router;
     }
