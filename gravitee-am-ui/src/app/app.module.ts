@@ -88,11 +88,11 @@ import { DomainSettingsScopesComponent } from "./domain/settings/scopes/scopes.c
 import { DomainSettingsCertificatesComponent, CertitificatePublicKeyDialog } from './domain/settings/certificates/certificates.component';
 import { DomainSettingsProvidersComponent } from "./domain/settings/providers/providers.component";
 import { DomainSettingsExtensionGrantsComponent } from "./domain/settings/extension-grants/extension-grants.component";
+import { DomainSettingsPagesComponent } from "./domain/settings/pages/pages.component";
 import { ClientsResolver } from "./resolvers/clients.resolver";
 import { ClientResolver } from "./resolvers/client.resolver";
 import { ProvidersResolver } from "./resolvers/providers.resolver";
 import { ProviderResolver } from "./resolvers/provider.resolver";
-import { DomainLoginFormResolver } from "./resolvers/domain-login-form.resolver";
 import { ProviderSettingsComponent } from './domain/settings/providers/provider/settings/settings.component';
 import { CreateMapperComponent, ProviderMappersComponent } from './domain/settings/providers/provider/mappers/mappers.component';
 import { Ng2BreadcrumbModule } from "libraries/ng2-breadcrumb/app.module";
@@ -129,8 +129,10 @@ import { SettingsComponent } from './settings/settings.component';
 import { HumanDatePipe } from './pipes/human-date.pipe';
 import { MapToIterablePipe } from './pipes/map-to-iterable.pipe';
 import { DummyComponent } from "./components/dummy/dummy.component";
-import { UsersComponent } from './domain/users/users.component';
-import { UserComponent } from './domain/users/user/user.component';
+import { UsersComponent } from './domain/settings/users/users.component';
+import { UserComponent } from './domain/settings/users/user/user.component';
+import { UserCreationComponent } from './domain/settings/users/creation/user-creation.component';
+import { UserClaimComponent } from './domain/settings/users/creation/user-claim.component';
 import { UserService} from "./services/user.service";
 import { UsersResolver } from "./resolvers/users.resolver";
 import { UserResolver } from "./resolvers/user.resolver";
@@ -145,6 +147,15 @@ import { ExtensionGrantCreationStep2Component } from "./domain/settings/extensio
 import { MaterialFileComponent } from "./components/json-schema-form/material-file.component";
 import { ManagementComponent } from "./settings/management/management.component";
 import { ManagementGeneralComponent } from "./settings/management/general/general.component";
+import { PageComponent, PageInfoDialog } from "./domain/settings/pages/page/page.component";
+import { PageService } from "./services/page.service";
+import { PageResolver } from "./resolvers/page.resolver";
+import { GroupsComponent } from "./domain/settings/groups/groups.component";
+import { GroupCreationComponent } from "./domain/settings/groups/creation/group-creation.component";
+import { GroupComponent } from "./domain/settings/groups/group/group.component";
+import { GroupService } from "./services/group.service";
+import { GroupsResolver } from "./resolvers/groups.resolver";
+import { GroupResolver } from "./resolvers/group.resolver";
 
 @NgModule({
   declarations: [
@@ -165,6 +176,7 @@ import { ManagementGeneralComponent } from "./settings/management/general/genera
     DomainSettingsCertificatesComponent,
     DomainSettingsLoginInfoDialog,
     DomainSettingsExtensionGrantsComponent,
+    DomainSettingsPagesComponent,
     ClientsComponent,
     ConfirmComponent,
     EmptystateComponent,
@@ -214,11 +226,18 @@ import { ManagementGeneralComponent } from "./settings/management/general/genera
     DummyComponent,
     UsersComponent,
     UserComponent,
+    UserCreationComponent,
+    UserClaimComponent,
     ScopeCreationComponent,
     ScopeComponent,
     MaterialFileComponent,
     ManagementComponent,
-    ManagementGeneralComponent
+    ManagementGeneralComponent,
+    PageComponent,
+    PageInfoDialog,
+    GroupsComponent,
+    GroupCreationComponent,
+    GroupComponent
   ],
   imports: [
     BrowserModule,
@@ -256,7 +275,6 @@ import { ManagementGeneralComponent } from "./settings/management/general/genera
     ClientResolver,
     ProvidersResolver,
     ProviderResolver,
-    DomainLoginFormResolver,
     CertificatesResolver,
     CertificateResolver,
     RolesResolver,
@@ -268,6 +286,11 @@ import { ManagementGeneralComponent } from "./settings/management/general/genera
     ScopesResolver,
     ScopeResolver,
     ScopeService,
+    PageService,
+    PageResolver,
+    GroupService,
+    GroupsResolver,
+    GroupResolver,
     { provide: Http, useClass: HttpService }
   ],
   entryComponents: [
@@ -278,7 +301,9 @@ import { ManagementGeneralComponent } from "./settings/management/general/genera
     CertitificatePublicKeyDialog,
     CreateRoleMapperComponent,
     SnackbarComponent,
-    MaterialFileComponent
+    MaterialFileComponent,
+    UserClaimComponent,
+    PageInfoDialog
   ],
   bootstrap: [AppComponent]
 })

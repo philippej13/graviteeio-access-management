@@ -137,7 +137,7 @@ public class OAuth2GenericAuthenticationProvider implements OAuth2Authentication
                     .filter(claimName -> jsonNode.containsKey(claimName))
                     .forEach(claimName -> additionalInformation.put(claimName, jsonNode.getValue(claimName)));
         }
-        ((DefaultUser) user).setAdditonalInformation(additionalInformation);
+        ((DefaultUser) user).setAdditionalInformation(additionalInformation);
         return user;
     }
 

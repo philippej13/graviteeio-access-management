@@ -49,6 +49,10 @@ import java.util.Map;
 public class MongoAuthenticationProvider implements AuthenticationProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MongoAuthenticationProvider.class);
+    private static final String FIELD_ID = "_id";
+    private static final String FIELD_USERNAME = "username";
+    private static final String FIELD_CREATED_AT = "createdAt";
+    private static final String FIELD_UPDATED_AT = "updatedAt";
 
     @Autowired
     private MongoIdentityProviderMapper mapper;
@@ -93,13 +97,24 @@ public class MongoAuthenticationProvider implements AuthenticationProvider {
     private User createUser(String username, Document document) {
         DefaultUser user = new DefaultUser(username);
         Map<String, Object> claims = new HashMap<>();
-        claims.put(StandardClaims.SUB, username);
+        claims.put(StandardClaims.SUB, document.getString(FIELD_ID));
         claims.put(StandardClaims.PREFERRED_USERNAME, username);
-        if(this.mapper.getMappers() != null) {
+        if (this.mapper.getMappers() != null && !this.mapper.getMappers().isEmpty()) {
             this.mapper.getMappers().forEach((k, v) -> claims.put(k, document.get(v)));
+        } else {
+            // default claims
+            // remove reserved claims
+            document.remove(FIELD_ID);
+            document.remove(FIELD_USERNAME);
+            document.remove(configuration.getPasswordField());
+            document.remove(FIELD_CREATED_AT);
+            if (document.containsKey(FIELD_UPDATED_AT)) {
+                document.put(StandardClaims.UPDATED_AT, document.get(FIELD_UPDATED_AT));
+                document.remove(FIELD_UPDATED_AT);
+            }
+            document.entrySet().forEach(entry -> claims.put(entry.getKey(), entry.getValue()));
         }
-
-        user.setAdditonalInformation(claims);
+        user.setAdditionalInformation(claims);
         return user;
     }
 

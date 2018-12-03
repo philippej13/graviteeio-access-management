@@ -20,7 +20,6 @@ import org.bson.Document;
 import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,8 +71,6 @@ public class ClientMongo extends Auditable {
     private String certificate;
 
     private boolean enhanceScopesWithUserPermissions;
-
-    private boolean generateNewTokenPerRequest;
 
     public String getId() {
         return id;
@@ -209,14 +206,6 @@ public class ClientMongo extends Auditable {
 
     public void setEnhanceScopesWithUserPermissions(boolean enhanceScopesWithUserPermissions) {
         this.enhanceScopesWithUserPermissions = enhanceScopesWithUserPermissions;
-    }
-
-    public boolean isGenerateNewTokenPerRequest() {
-        return generateNewTokenPerRequest;
-    }
-
-    public void setGenerateNewTokenPerRequest(boolean generateNewTokenPerRequest) {
-        this.generateNewTokenPerRequest = generateNewTokenPerRequest;
     }
 
     @Override

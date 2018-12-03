@@ -77,7 +77,7 @@ public class OAuth2ClientAuthenticationProvider implements AuthProvider {
                     Map<String, Object> additionalInformation = user.getAdditionalInformation() == null ? new HashMap<>() : new HashMap<>(user.getAdditionalInformation());
                     additionalInformation.put("source", authInfo.getString(PROVIDER_PARAMETER));
                     additionalInformation.put(OAuth2Constants.CLIENT_ID, authInfo.getString(OAuth2Constants.CLIENT_ID));
-                    ((DefaultUser) user).setAdditonalInformation(additionalInformation);
+                    ((DefaultUser) user).setAdditionalInformation(additionalInformation);
                     return userService.findOrCreate(user);
                 })
                 .subscribe(user -> resultHandler.handle(Future.succeededFuture(new io.gravitee.am.gateway.handler.vertx.auth.user.User(user))), error -> {

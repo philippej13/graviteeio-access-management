@@ -54,7 +54,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Single<User> findOrCreate(io.gravitee.am.identityprovider.api.User user) {
-        return userRepository.findByUsernameAndDomain(domain.getId(), user.getUsername())
+        String source = (String) user.getAdditionalInformation().get("source");
+        return userRepository.findByDomainAndUsernameAndSource(domain.getId(), user.getUsername(), source)
                 .switchIfEmpty(Maybe.error(new UserNotFoundException(user.getUsername())))
                 .flatMapSingle(existingUser -> {
                     logger.debug("Updating user: username[%s]", user.getUsername());

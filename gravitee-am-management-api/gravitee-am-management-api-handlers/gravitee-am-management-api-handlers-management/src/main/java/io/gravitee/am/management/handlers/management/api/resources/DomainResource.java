@@ -135,4 +135,14 @@ public class DomainResource extends AbstractResource {
     public ScopesResource getScopesResource() {
         return resourceContext.getResource(ScopesResource.class);
     }
+
+    @Path("pages")
+    public PagesResource getPagesResource() {
+        return resourceContext.getResource(PagesResource.class);
+    }
+
+    @Path("groups")
+    public GroupsResource getGroupsResource() {
+        return resourceContext.getResource(GroupsResource.class);
+    }
 }

@@ -69,6 +69,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
                 .onErrorResumeNext(ex -> {
                     if (ex instanceof UserNotFoundException) {
                         final NewUser newUser = new NewUser();
+                        newUser.setInternal(false);
                         newUser.setUsername(principal.getUsername());
                         if (details != null) {
                             newUser.setSource(details.get(SOURCE));

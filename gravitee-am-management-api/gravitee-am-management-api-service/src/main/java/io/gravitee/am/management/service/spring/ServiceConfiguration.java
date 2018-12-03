@@ -17,6 +17,7 @@ package io.gravitee.am.management.service.spring;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -24,5 +25,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan("io.gravitee.am.management.service")
+@Import(EmailConfiguration.class)
 public class ServiceConfiguration {
 }

@@ -23,7 +23,10 @@ import io.gravitee.am.gateway.handler.vertx.handler.login.LoginRouter;
 import io.gravitee.am.gateway.handler.vertx.handler.oauth2.OAuth2Router;
 import io.gravitee.am.gateway.handler.vertx.handler.oauth2.endpoint.authorization.AuthorizationEndpointFailureHandler;
 import io.gravitee.am.gateway.handler.vertx.handler.oidc.OIDCRouter;
+import io.gravitee.am.gateway.handler.vertx.handler.scim.SCIMRouter;
+import io.gravitee.am.gateway.handler.vertx.handler.scim.handler.ErrorHandler;
 import io.gravitee.am.gateway.handler.vertx.handler.session.RxSessionHandler;
+import io.gravitee.am.gateway.handler.vertx.handler.users.UsersRouter;
 import io.gravitee.am.model.Domain;
 import io.gravitee.common.utils.UUID;
 import io.vertx.core.Handler;
@@ -68,6 +71,12 @@ public class VertxSecurityDomainHandler {
     private OAuth2Router oauth2Router;
 
     @Autowired
+    private SCIMRouter scimRouter;
+
+    @Autowired
+    private UsersRouter usersRouter;
+
+    @Autowired
     private Environment environment;
 
     public Router create() {
@@ -78,6 +87,7 @@ public class VertxSecurityDomainHandler {
         Handler<RoutingContext> authorizationEndpointFailureHandler = new AuthorizationEndpointFailureHandler(domain);
         router.route("/login").failureHandler(authorizationEndpointFailureHandler);
         router.route("/oauth/authorize").failureHandler(authorizationEndpointFailureHandler);
+        router.routeWithRegex("/scim/(.*)").failureHandler(new ErrorHandler());
         router.route().failureHandler(new ExceptionHandler());
 
         // user authentication handler
@@ -103,6 +113,12 @@ public class VertxSecurityDomainHandler {
 
         // mount OpenID Connect router
         router.mountSubRouter("/oidc", oidcRouter.route());
+
+        // mount SCIM router
+        router.mountSubRouter("/scim", scimRouter.route());
+
+        // mount Users router
+        router.mountSubRouter("/users", usersRouter.route());
 
         return router;
     }

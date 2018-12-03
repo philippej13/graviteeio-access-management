@@ -132,7 +132,7 @@ public class InlineAuthenticationProvider implements AuthenticationProvider, Ini
                 claims.put(StandardClaims.EMAIL, inlineUser.getEmail());
             }
         }
-        user.setAdditonalInformation(claims);
+        user.setAdditionalInformation(claims);
 
         // set user roles
         user.setRoles(getUserRoles(inlineUser));

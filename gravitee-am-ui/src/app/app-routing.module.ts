@@ -22,11 +22,11 @@ import {DomainComponent} from "./domain/domain.component";
 import {DomainDashboardComponent} from "./domain/dashboard/dashboard.component";
 import {DomainSettingsComponent} from "./domain/settings/settings.component";
 import {DomainSettingsGeneralComponent} from "./domain/settings/general/general.component";
-import {DomainSettingsLoginComponent} from "./domain/settings/login/login.component";
 import {DomainSettingsCertificatesComponent} from "./domain/settings/certificates/certificates.component";
 import {DomainSettingsProvidersComponent} from "./domain/settings/providers/providers.component";
 import {DomainSettingsRolesComponent} from "./domain/settings/roles/roles.component";
 import {DomainSettingsScopesComponent} from "./domain/settings/scopes/scopes.component";
+import {DomainSettingsPagesComponent} from "./domain/settings/pages/pages.component";
 import {ClientsComponent} from "./clients/clients.component";
 import {ClientComponent} from "./domain/clients/client/client.component";
 import {ClientCreationComponent} from "./clients/creation/client-creation.component";
@@ -42,7 +42,6 @@ import {ClientResolver} from "./resolvers/client.resolver";
 import {ProvidersResolver} from "./resolvers/providers.resolver";
 import {ProviderResolver} from "./resolvers/provider.resolver";
 import {ProviderRolesComponent} from "./domain/settings/providers/provider/roles/roles.component";
-import {DomainLoginFormResolver} from "./resolvers/domain-login-form.resolver";
 import {ProviderSettingsComponent} from "./domain/settings/providers/provider/settings/settings.component";
 import {ProviderMappersComponent} from "./domain/settings/providers/provider/mappers/mappers.component";
 import {ClientOIDCComponent} from "./domain/clients/client/oidc/oidc.component";
@@ -63,10 +62,11 @@ import {ScopeComponent} from './domain/settings/scopes/scope/scope.component';
 import {DashboardComponent} from "./dashboard/dashboard.component";
 import {SettingsComponent} from "./settings/settings.component";
 import {DummyComponent} from "./components/dummy/dummy.component";
-import {UsersComponent} from "./domain/users/users.component";
+import {UsersComponent} from "./domain/settings/users/users.component";
 import {UsersResolver} from "./resolvers/users.resolver";
-import {UserComponent} from "./domain/users/user/user.component";
+import {UserComponent} from "./domain/settings/users/user/user.component";
 import {UserResolver} from "./resolvers/user.resolver";
+import {UserCreationComponent} from "./domain/settings/users/creation/user-creation.component";
 import {DomainSettingsExtensionGrantsComponent} from "./domain/settings/extension-grants/extension-grants.component";
 import {ExtensionGrantCreationComponent} from "./domain/settings/extension-grants/creation/extension-grant-creation.component";
 import {ExtensionGrantComponent} from "./domain/settings/extension-grants/extension-grant/extension-grant.component";
@@ -74,6 +74,13 @@ import {ExtensionGrantsResolver} from "./resolvers/extension-grants.resolver";
 import {ExtensionGrantResolver} from "./resolvers/extension-grant.resolver";
 import {ManagementComponent} from "./settings/management/management.component";
 import {ManagementGeneralComponent} from "./settings/management/general/general.component";
+import {PageComponent} from "./domain/settings/pages/page/page.component";
+import {PageResolver} from "./resolvers/page.resolver";
+import {GroupsResolver} from "./resolvers/groups.resolver";
+import {GroupsComponent} from "./domain/settings/groups/groups.component";
+import {GroupCreationComponent} from "./domain/settings/groups/creation/group-creation.component";
+import {GroupResolver} from "./resolvers/group.resolver";
+import {GroupComponent} from "./domain/settings/groups/group/group.component";
 
 const routes: Routes = [
   { path: 'dashboard',
@@ -159,10 +166,11 @@ const routes: Routes = [
               }
             }
           },
-          { path: 'login',
-            component: DomainSettingsLoginComponent,
+          {
+            path: 'login',
+            component: PageComponent,
             resolve: {
-              domainLoginForm: DomainLoginFormResolver
+              page: PageResolver
             },
             data: {
               menu: {
@@ -322,24 +330,6 @@ const routes: Routes = [
           { path: 'oidc', component: ClientOIDCComponent }
         ]
       },
-      { path: 'users', component: UsersComponent,
-        resolve: {
-          users: UsersResolver
-        },
-        data: {
-          menu: {
-            label: 'Users',
-            icon: 'person',
-          }
-        }
-      },
-      {
-        path: 'users/:userId',
-        component: UserComponent,
-        resolve: {
-          user: UserResolver
-        }
-      },
       { path: 'settings', component: DomainSettingsComponent,
         resolve: {
           domain: DomainResolver,
@@ -361,17 +351,20 @@ const routes: Routes = [
               }
             }
           },
-          { path: 'login',
-            component: DomainSettingsLoginComponent,
-            resolve: {
-              domainLoginForm: DomainLoginFormResolver
-            },
+          { path: 'pages',
+            component: DomainSettingsPagesComponent,
             data: {
               menu: {
-                label: 'Login Page',
+                label: 'Custom Pages',
                 section: 'Settings'
               }
             }
+          },
+          { path: 'pages/page',
+            component: PageComponent,
+            resolve: {
+              page: PageResolver
+            },
           },
           { path: 'scopes',
             component: DomainSettingsScopesComponent,
@@ -494,6 +487,48 @@ const routes: Routes = [
               scopes: ScopesResolver
             }
           },
+          { path: 'users', component: UsersComponent,
+            resolve: {
+              users: UsersResolver
+            },
+            data: {
+              menu: {
+                label: 'Users',
+                section: 'User Management'
+              }
+            }
+          },
+          { path: 'users/new',
+            component: UserCreationComponent
+          },
+          {
+            path: 'users/:userId',
+            component: UserComponent,
+            resolve: {
+              user: UserResolver
+            }
+          },
+          { path: 'groups', component: GroupsComponent,
+            resolve: {
+              groups: GroupsResolver
+            },
+            data: {
+              menu: {
+                label: 'Groups',
+                section: 'User Management'
+              }
+            }
+          },
+          { path: 'groups/new',
+            component: GroupCreationComponent
+          },
+          {
+            path: 'groups/:userId',
+            component: GroupComponent,
+            resolve: {
+              group: GroupResolver
+            }
+          }
         ]
       }
     ]

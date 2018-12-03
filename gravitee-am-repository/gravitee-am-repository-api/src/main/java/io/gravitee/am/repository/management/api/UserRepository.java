@@ -22,6 +22,7 @@ import io.gravitee.am.repository.exceptions.TechnicalException;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,6 +35,11 @@ public interface UserRepository extends CrudRepository<User, String> {
 
     Single<Page<User>> findByDomain(String domain, int page, int size);
 
+    Single<List<User>> findByDomainAndEmail(String domain, String email);
+
     Maybe<User> findByUsernameAndDomain(String domain, String username);
+
+    Maybe<User> findByDomainAndUsernameAndSource(String domain, String username, String source);
+
 
 }

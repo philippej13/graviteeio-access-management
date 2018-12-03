@@ -19,8 +19,6 @@ import io.gravitee.am.model.User;
 import io.gravitee.am.model.common.Page;
 import io.gravitee.am.repository.management.api.UserRepository;
 import io.gravitee.am.service.UserService;
-import io.gravitee.am.service.authentication.crypto.password.PasswordEncoder;
-import io.gravitee.am.service.authentication.crypto.password.bcrypt.BCryptPasswordEncoder;
 import io.gravitee.am.service.exception.AbstractManagementException;
 import io.gravitee.am.service.exception.TechnicalManagementException;
 import io.gravitee.am.service.exception.UserNotFoundException;
@@ -46,23 +44,18 @@ import java.util.Set;
 @Component
 public class UserServiceImpl implements UserService {
 
-    /**
-     * Logger.
-     */
     private final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private UserRepository userRepository;
-
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public Single<Set<User>> findByDomain(String domain) {
         LOGGER.debug("Find users by domain: {}", domain);
         return userRepository.findByDomain(domain)
                 .onErrorResumeNext(ex -> {
-                    LOGGER.error("An error occurs while trying to find users by domain", ex);
-                    return Single.error(new TechnicalManagementException("An error occurs while trying to find users by domain", ex));
+                    LOGGER.error("An error occurs while trying to find users by domain {}", domain, ex);
+                    return Single.error(new TechnicalManagementException(String.format("An error occurs while trying to find users by domain %s", domain), ex));
                 });
     }
 
@@ -71,8 +64,8 @@ public class UserServiceImpl implements UserService {
         LOGGER.debug("Find users by domain: {}", domain);
         return userRepository.findByDomain(domain, page, size)
                 .onErrorResumeNext(ex -> {
-                    LOGGER.error("An error occurs while trying to find users by domain", ex);
-                    return Single.error(new TechnicalManagementException("An error occurs while trying to find users by domain", ex));
+                    LOGGER.error("An error occurs while trying to find users by domain {}", domain, ex);
+                    return Single.error(new TechnicalManagementException(String.format("An error occurs while trying to find users by domain %s", domain), ex));
                 });
     }
 
@@ -81,7 +74,7 @@ public class UserServiceImpl implements UserService {
         LOGGER.debug("Find user by id : {}", id);
         return userRepository.findById(id)
                 .onErrorResumeNext(ex -> {
-                    LOGGER.error("An error occurs while trying to find a user using its ID", id, ex);
+                    LOGGER.error("An error occurs while trying to find a user using its ID {}", id, ex);
                     return Maybe.error(new TechnicalManagementException(
                             String.format("An error occurs while trying to find a user using its ID: %s", id), ex));
                 });
@@ -109,18 +102,13 @@ public class UserServiceImpl implements UserService {
         user.setId(userId);
         user.setDomain(domain);
         user.setUsername(newUser.getUsername());
-
-        if (newUser.getPassword() != null) {
-            user.setPassword(passwordEncoder.encode(newUser.getPassword()));
-        }
-
         user.setFirstName(newUser.getFirstName());
         user.setLastName(newUser.getLastName());
         user.setEmail(newUser.getEmail());
         user.setSource(newUser.getSource());
-        user.setClient(newUser.getClient());
-        user.setLoggedAt(newUser.getLoggedAt());
-        user.setLoginsCount(newUser.getLoginsCount());
+        user.setInternal(true);
+        user.setPreRegistration(newUser.isPreRegistration());
+        user.setRegistrationCompleted(newUser.isRegistrationCompleted());
         user.setAdditionalInformation(newUser.getAdditionalInformation());
         user.setCreatedAt(new Date());
         user.setUpdatedAt(user.getCreatedAt());
@@ -138,19 +126,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id)
                 .switchIfEmpty(Maybe.error(new UserNotFoundException(id)))
                 .flatMapSingle(oldUser -> {
-                    if (updateUser.getPassword() != null) {
-                        oldUser.setPassword(passwordEncoder.encode(updateUser.getPassword()));
-                    }
                     oldUser.setFirstName(updateUser.getFirstName());
                     oldUser.setLastName(updateUser.getLastName());
                     oldUser.setEmail(updateUser.getEmail());
-                    oldUser.setSource(updateUser.getSource());
-                    oldUser.setClient(updateUser.getClient());
-                    oldUser.setLoggedAt(updateUser.getLoggedAt());
-                    oldUser.setLoginsCount(updateUser.getLoginsCount());
                     oldUser.setUpdatedAt(new Date());
                     oldUser.setAdditionalInformation(updateUser.getAdditionalInformation());
-
                     return userRepository.update(oldUser);
                 })
                 .onErrorResumeNext(ex -> {

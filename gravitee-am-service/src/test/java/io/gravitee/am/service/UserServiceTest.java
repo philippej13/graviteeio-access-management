@@ -199,8 +199,6 @@ public class UserServiceTest {
     @Test
     public void shouldUpdate() {
         UpdateUser updateUser = Mockito.mock(UpdateUser.class);
-        when(updateUser.getPassword()).thenReturn("password");
-        when(passwordEncoder.encode("password")).thenReturn("password");
         when(userRepository.findById("my-user")).thenReturn(Maybe.just(new User()));
         when(userRepository.update(any(User.class))).thenReturn(Single.just(new User()));
 
@@ -217,8 +215,6 @@ public class UserServiceTest {
     @Test
     public void shouldUpdate_technicalException() {
         UpdateUser updateUser = Mockito.mock(UpdateUser.class);
-        when(updateUser.getPassword()).thenReturn("password");
-        when(passwordEncoder.encode("password")).thenReturn("password");
         when(userRepository.findById("my-user")).thenReturn(Maybe.just(new User()));
         when(userRepository.update(any(User.class))).thenReturn(Single.error(TechnicalException::new));
 
@@ -232,8 +228,6 @@ public class UserServiceTest {
     @Test
     public void shouldUpdate_userNotFound() {
         UpdateUser updateUser = Mockito.mock(UpdateUser.class);
-        when(updateUser.getPassword()).thenReturn("password");
-        when(passwordEncoder.encode("password")).thenReturn("password");
         when(userRepository.findById("my-user")).thenReturn(Maybe.empty());
 
         TestObserver testObserver = new TestObserver();

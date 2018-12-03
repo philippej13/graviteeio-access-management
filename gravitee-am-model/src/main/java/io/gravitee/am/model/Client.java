@@ -81,6 +81,8 @@ public class Client {
 
     private boolean enhanceScopesWithUserPermissions;
 
+    private boolean useDefaultIdentityProvider;
+
     public String getId() {
         return id;
     }
@@ -231,6 +233,14 @@ public class Client {
 
     public void setEnhanceScopesWithUserPermissions(boolean enhanceScopesWithUserPermissions) {
         this.enhanceScopesWithUserPermissions = enhanceScopesWithUserPermissions;
+    }
+
+    public boolean isUseDefaultIdentityProvider() {
+        return useDefaultIdentityProvider;
+    }
+
+    public void setUseDefaultIdentityProvider(boolean useDefaultIdentityProvider) {
+        this.useDefaultIdentityProvider = useDefaultIdentityProvider;
     }
 
     @Override

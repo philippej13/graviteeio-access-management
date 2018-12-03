@@ -171,7 +171,7 @@ public class GithubAuthenticationProvider implements OAuth2AuthenticationProvide
         additionalInformation.put(GithubUser.BIO, jsonObject.getValue(GithubUser.BIO));
         additionalInformation.put(GithubUser.BLOG, jsonObject.getValue(GithubUser.BLOG));
         additionalInformation.put(GithubUser.CREATED_AT, jsonObject.getValue(GithubUser.CREATED_AT));
-        ((DefaultUser) user).setAdditonalInformation(additionalInformation);
+        ((DefaultUser) user).setAdditionalInformation(additionalInformation);
         return user;
     }
 }

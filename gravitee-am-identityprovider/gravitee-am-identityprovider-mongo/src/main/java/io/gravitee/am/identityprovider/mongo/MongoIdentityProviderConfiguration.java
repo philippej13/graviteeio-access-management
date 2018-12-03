@@ -16,6 +16,7 @@
 package io.gravitee.am.identityprovider.mongo;
 
 import io.gravitee.am.identityprovider.api.IdentityProviderConfiguration;
+import io.gravitee.am.identityprovider.mongo.utils.PasswordEncoder;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
@@ -33,6 +34,7 @@ public class MongoIdentityProviderConfiguration implements IdentityProviderConfi
     private String usersCollection;
     private String findUserByUsernameQuery;
     private String passwordField;
+    private String passwordEncoder = PasswordEncoder.BCRYPT.getValue();
 
     public String getUri() {
         return this.uri;
@@ -120,5 +122,13 @@ public class MongoIdentityProviderConfiguration implements IdentityProviderConfi
 
     public void setPasswordField(String passwordField) {
         this.passwordField = passwordField;
+    }
+
+    public String getPasswordEncoder() {
+        return passwordEncoder;
+    }
+
+    public void setPasswordEncoder(String passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 }

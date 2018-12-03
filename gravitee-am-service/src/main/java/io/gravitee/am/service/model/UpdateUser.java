@@ -15,6 +15,7 @@
  */
 package io.gravitee.am.service.model;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Map;
 
@@ -24,8 +25,7 @@ import java.util.Map;
  */
 public class UpdateUser {
 
-    private String password;
-
+    @NotNull
     private String email;
 
     private String firstName;
@@ -40,11 +40,15 @@ public class UpdateUser {
 
     private boolean enabled = true;
 
+    private boolean preRegistration;
+
+    private boolean registrationCompleted;
+
     private String source;
 
     private String client;
 
-    private Long loginsCount;
+    private long loginsCount;
 
     private Date loggedAt;
 
@@ -53,14 +57,6 @@ public class UpdateUser {
     private Date createdAt;
 
     private Date updatedAt;
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getEmail() {
         return email;
@@ -118,6 +114,22 @@ public class UpdateUser {
         this.enabled = enabled;
     }
 
+    public boolean isPreRegistration() {
+        return preRegistration;
+    }
+
+    public void setPreRegistration(boolean preRegistration) {
+        this.preRegistration = preRegistration;
+    }
+
+    public boolean isRegistrationCompleted() {
+        return registrationCompleted;
+    }
+
+    public void setRegistrationCompleted(boolean registrationCompleted) {
+        this.registrationCompleted = registrationCompleted;
+    }
+
     public String getSource() {
         return source;
     }
@@ -134,11 +146,11 @@ public class UpdateUser {
         this.client = client;
     }
 
-    public Long getLoginsCount() {
+    public long getLoginsCount() {
         return loginsCount;
     }
 
-    public void setLoginsCount(Long loginsCount) {
+    public void setLoginsCount(long loginsCount) {
         this.loginsCount = loginsCount;
     }
 

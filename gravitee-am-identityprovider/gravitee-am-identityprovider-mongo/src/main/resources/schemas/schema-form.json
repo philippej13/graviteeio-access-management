@@ -65,12 +65,20 @@
       "default": "password",
       "title": "Password field",
       "description": "The user password field (must be in the same collection as the users."
+    },
+    "passwordEncoder" : {
+      "type": "string",
+      "enum": ["BCrypt", "None"],
+      "default": "BCrypt",
+      "title": "Password encoder",
+      "description": "The encoding mechanism to store password value."
     }
   },
   "required": [
     "database",
     "usersCollection",
     "findUserByUsernameQuery",
-    "passwordField"
+    "passwordField",
+    "passwordEncoder"
   ]
 }

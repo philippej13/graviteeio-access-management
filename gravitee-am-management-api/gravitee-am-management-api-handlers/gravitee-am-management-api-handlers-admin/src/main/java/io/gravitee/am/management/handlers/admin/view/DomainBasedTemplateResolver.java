@@ -16,29 +16,58 @@
 package io.gravitee.am.management.handlers.admin.view;
 
 import io.gravitee.am.model.Domain;
+import io.gravitee.am.model.Page;
+import io.gravitee.am.model.PageType;
+import io.gravitee.am.model.Template;
+import io.gravitee.am.service.PageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.thymeleaf.IEngineConfiguration;
-import org.thymeleaf.templateresolver.StringTemplateResolver;
+import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
+ * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
  * @author GraviteeSource Team
  */
-public class DomainBasedTemplateResolver extends StringTemplateResolver {
+public class DomainBasedTemplateResolver extends AbstractConfigurableTemplateResolver implements InitializingBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(DomainBasedTemplateResolver.class);
+
+    @Autowired
+    private PageService pageService;
 
     @Autowired
     private Domain domain;
 
-    public DomainBasedTemplateResolver() {
-        setTemplateMode("HTML");
+    private Map<String, String> templates = new HashMap<>();
+
+    @Override
+    protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration, String ownerTemplate, String template, String resourceName, String characterEncoding, Map<String, Object> templateResolutionAttributes) {
+        if (templates.containsKey(resourceName)) {
+            return new StringTemplateResource(templates.get(resourceName));
+        }
+        return null;
     }
 
     @Override
-    protected ITemplateResource computeTemplateResource(IEngineConfiguration configuration, String ownerTemplate, String template, Map<String, Object> templateResolutionAttributes) {
-        return new StringTemplateResource(domain.getLoginForm().getContent());
+    public void afterPropertiesSet() {
+        pageService.findByDomainAndTypeAndTemplate(domain.getId(), PageType.HTML.type(), Template.LOGIN.template())
+                .filter(Page::isEnabled)
+                .subscribe(
+                        page -> {
+                            logger.info("Login page has been overridden with custom {} custom page.", domain.getName());
+                            templates.put(page.getTemplate(), page.getContent());
+                        },
+                        error -> logger.error("Unable to initialize login page for domain {}", domain.getName(), error),
+                        () -> logger.info("View templating has not been overridden with custom view, returning default views.")
+                );
     }
 }

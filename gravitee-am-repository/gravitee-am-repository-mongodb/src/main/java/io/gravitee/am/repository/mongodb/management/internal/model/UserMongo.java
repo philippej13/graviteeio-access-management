@@ -21,7 +21,6 @@ import org.bson.codecs.pojo.annotations.BsonId;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
@@ -32,7 +31,6 @@ public class UserMongo extends Auditable {
     @BsonId
     private String id;
     private String username;
-    private String password;
     private String email;
     private String firstName;
     private String lastName;
@@ -40,6 +38,9 @@ public class UserMongo extends Auditable {
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
+    private boolean internal;
+    private boolean preRegistration;
+    private boolean registrationCompleted;
     private String domain;
     private String source;
     private String client;
@@ -65,14 +66,6 @@ public class UserMongo extends Auditable {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getEmail() {
@@ -129,6 +122,30 @@ public class UserMongo extends Auditable {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isInternal() {
+        return internal;
+    }
+
+    public void setInternal(boolean internal) {
+        this.internal = internal;
+    }
+
+    public boolean isPreRegistration() {
+        return preRegistration;
+    }
+
+    public void setPreRegistration(boolean preRegistration) {
+        this.preRegistration = preRegistration;
+    }
+
+    public boolean isRegistrationCompleted() {
+        return registrationCompleted;
+    }
+
+    public void setRegistrationCompleted(boolean registrationCompleted) {
+        this.registrationCompleted = registrationCompleted;
     }
 
     public String getDomain() {

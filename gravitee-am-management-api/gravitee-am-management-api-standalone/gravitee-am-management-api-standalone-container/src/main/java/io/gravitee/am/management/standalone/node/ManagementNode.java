@@ -16,6 +16,7 @@
 package io.gravitee.am.management.standalone.node;
 
 import io.gravitee.am.management.core.http.HttpServer;
+import io.gravitee.am.management.service.EmailService;
 import io.gravitee.am.management.service.InitializerService;
 import io.gravitee.common.component.LifecycleComponent;
 import io.gravitee.node.container.AbstractNode;
@@ -44,6 +45,7 @@ public class ManagementNode extends AbstractNode {
 
         components.add(HttpServer.class);
         components.add(InitializerService.class);
+        components.add(EmailService.class);
 
         return components;
     }

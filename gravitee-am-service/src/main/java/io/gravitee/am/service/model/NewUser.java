@@ -15,6 +15,7 @@
  */
 package io.gravitee.am.service.model;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Map;
 
@@ -24,10 +25,12 @@ import java.util.Map;
  */
 public class NewUser {
 
+    @NotNull
     private String username;
 
     private String password;
 
+    @NotNull
     private String email;
 
     private String firstName;
@@ -41,6 +44,12 @@ public class NewUser {
     private boolean credentialsNonExpired = true;
 
     private boolean enabled = true;
+
+    private boolean internal;
+
+    private boolean preRegistration;
+
+    private boolean registrationCompleted;
 
     private String domain;
 
@@ -128,6 +137,30 @@ public class NewUser {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isInternal() {
+        return internal;
+    }
+
+    public void setInternal(boolean internal) {
+        this.internal = internal;
+    }
+
+    public boolean isPreRegistration() {
+        return preRegistration;
+    }
+
+    public void setPreRegistration(boolean preRegistration) {
+        this.preRegistration = preRegistration;
+    }
+
+    public boolean isRegistrationCompleted() {
+        return registrationCompleted;
+    }
+
+    public void setRegistrationCompleted(boolean registrationCompleted) {
+        this.registrationCompleted = registrationCompleted;
     }
 
     public String getDomain() {

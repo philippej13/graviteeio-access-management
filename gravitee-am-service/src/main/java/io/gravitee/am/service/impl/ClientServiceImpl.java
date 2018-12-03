@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,6 +59,7 @@ import java.util.stream.Collectors;
 public class ClientServiceImpl implements ClientService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ClientServiceImpl.class);
+    private static final String DEFAULT_IDP_ID = "gravitee-am";
 
     @Autowired
     private ClientRepository clientRepository;
@@ -298,6 +300,7 @@ public class ClientServiceImpl implements ClientService {
                         return Single.just(client);
                     } else {
                         return Observable.fromIterable(identities)
+                                .filter(identity -> !DEFAULT_IDP_ID.equals(identity))
                                 .flatMapMaybe(identityProviderId -> identityProviderService.findById(identityProviderId))
                                 .toList()
                                 .flatMap(idp -> Single.just(client));
@@ -311,12 +314,15 @@ public class ClientServiceImpl implements ClientService {
                     client.setAuthorizedGrantTypes(updateClient.getAuthorizedGrantTypes());
                     client.setRedirectUris(updateClient.getRedirectUris());
                     client.setEnabled(updateClient.isEnabled());
-                    client.setIdentities(updateClient.getIdentities());
                     client.setOauth2Identities(updateClient.getOauth2Identities());
                     client.setIdTokenValiditySeconds(updateClient.getIdTokenValiditySeconds());
                     client.setIdTokenCustomClaims(updateClient.getIdTokenCustomClaims());
                     client.setCertificate(updateClient.getCertificate());
                     client.setEnhanceScopesWithUserPermissions(updateClient.isEnhanceScopesWithUserPermissions());
+
+                    // set identities
+                    Set<String> identities = (updateClient.getIdentities() != null) ? new HashSet<>(updateClient.getIdentities()) : new HashSet();
+                    client.setIdentities(identities);
                     client.setUpdatedAt(new Date());
 
                     return clientRepository.update(client)

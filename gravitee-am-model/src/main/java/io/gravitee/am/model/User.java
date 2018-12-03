@@ -22,6 +22,7 @@ import java.util.Set;
 
 /**
  * @author David BRASSELY (david.brassely at graviteesource.com)
+ * @author Titouan COMPIEGNE (titouan.compiegne at graviteesource.com)
  * @author GraviteeSource Team
  */
 public class User {
@@ -34,9 +35,15 @@ public class User {
 
     private String email;
 
+    private String displayName;
+
+    private String nickName;
+
     private String firstName;
 
     private String lastName;
+
+    private String title;
 
     private boolean accountNonExpired = true;
 
@@ -45,6 +52,12 @@ public class User {
     private boolean credentialsNonExpired = true;
 
     private boolean enabled = true;
+
+    private boolean internal;
+
+    private boolean preRegistration;
+
+    private boolean registrationCompleted;
 
     /**
      * Security domain associated to the client
@@ -101,6 +114,22 @@ public class User {
         this.email = email;
     }
 
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -115,6 +144,14 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public boolean isAccountNonExpired() {
@@ -147,6 +184,30 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public boolean isInternal() {
+        return internal;
+    }
+
+    public void setInternal(boolean internal) {
+        this.internal = internal;
+    }
+
+    public boolean isPreRegistration() {
+        return preRegistration;
+    }
+
+    public void setPreRegistration(boolean preRegistration) {
+        this.preRegistration = preRegistration;
+    }
+
+    public boolean isRegistrationCompleted() {
+        return registrationCompleted;
+    }
+
+    public void setRegistrationCompleted(boolean registrationCompleted) {
+        this.registrationCompleted = registrationCompleted;
     }
 
     public String getDomain() {
