@@ -15,7 +15,7 @@
  */
 package io.gravitee.am.service.model.openid;
 
-import io.gravitee.am.model.oidc.DynamicClientRegistrationSettings;
+import io.gravitee.am.model.oidc.ClientRegistrationSettings;
 import io.gravitee.am.model.oidc.OIDCSettings;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,8 +43,8 @@ public class PatchOIDCSettingsTest {
         OIDCSettings result = nullSettings.patch(null);
 
         assertNotNull(result);
-        assertNotNull(result.getDynamicClientRegistration());
-        assertFalse("should be disabled by default", result.getDynamicClientRegistration().isEnabled());
+        assertNotNull(result.getClientRegistrationSettings());
+        assertFalse("should be disabled by default", result.getClientRegistrationSettings().isDynamicClientRegistrationEnabled());
     }
 
 
@@ -52,66 +52,66 @@ public class PatchOIDCSettingsTest {
     public void testPatchToEmptyValue() {
         //Build patcher
         PatchOIDCSettings emptySettings = new PatchOIDCSettings();
-        emptySettings.setDynamicClientRegistration(Optional.empty());
+        emptySettings.setClientRegistrationSettings(Optional.empty());
 
         //apply patch to empty object
         OIDCSettings result = emptySettings.patch(new OIDCSettings());
 
         assertNotNull(result);
-        assertNotNull(result.getDynamicClientRegistration());
-        assertFalse("should be disabled by default", result.getDynamicClientRegistration().isEnabled());
+        assertNotNull(result.getClientRegistrationSettings());
+        assertFalse("should be disabled by default", result.getClientRegistrationSettings().isDynamicClientRegistrationEnabled());
     }
 
     @Test
     public void testPatchSettingsToEmptyValue() {
         //Build patcher
         PatchOIDCSettings patcher = new PatchOIDCSettings();
-        PatchDCRSettings dcrPatcher = new PatchDCRSettings();
-        dcrPatcher.setEnabled(Optional.of(true));
+        PatchClientRegistrationSettings dcrPatcher = new PatchClientRegistrationSettings();
+        dcrPatcher.setDynamicClientRegistrationEnabled(Optional.of(true));
         dcrPatcher.setAllowLocalhostRedirectUri(Optional.of(true));
-        patcher.setDynamicClientRegistration(Optional.of(dcrPatcher));
+        patcher.setClientRegistrationSettings(Optional.of(dcrPatcher));
 
         //apply patch
         OIDCSettings result = patcher.patch(new OIDCSettings());
 
         assertNotNull(result);
-        assertNotNull(result.getDynamicClientRegistration());
-        assertTrue("should be enabled",result.getDynamicClientRegistration().isEnabled());
-        assertTrue("should be enabled",result.getDynamicClientRegistration().isAllowLocalhostRedirectUri());
-        assertFalse("should be disabled by default", result.getDynamicClientRegistration().isOpenRegistrationEnabled());
+        assertNotNull(result.getClientRegistrationSettings());
+        assertTrue("should be enabled",result.getClientRegistrationSettings().isDynamicClientRegistrationEnabled());
+        assertTrue("should be enabled",result.getClientRegistrationSettings().isAllowLocalhostRedirectUri());
+        assertFalse("should be disabled by default", result.getClientRegistrationSettings().isOpenDynamicClientRegistrationEnabled());
     }
 
     @Test
     public void testPatchEmtpySettings() {
         //Build object to patch
-        DynamicClientRegistrationSettings dcrSettings = new DynamicClientRegistrationSettings();
-        dcrSettings.setEnabled(true);
-        dcrSettings.setOpenRegistrationEnabled(false);
+        ClientRegistrationSettings dcrSettings = new ClientRegistrationSettings();
+        dcrSettings.setDynamicClientRegistrationEnabled(true);
+        dcrSettings.setOpenDynamicClientRegistrationEnabled(false);
         dcrSettings.setAllowLocalhostRedirectUri(true);
         dcrSettings.setAllowHttpSchemeRedirectUri(false);
         dcrSettings.setAllowWildCardRedirectUri(true);
         OIDCSettings toPatch = new OIDCSettings();
-        toPatch.setDynamicClientRegistration(dcrSettings);
+        toPatch.setClientRegistrationSettings(dcrSettings);
 
         //Build patcher
         PatchOIDCSettings patcher = new PatchOIDCSettings();
-        PatchDCRSettings dcrPatcher = new PatchDCRSettings();
-        dcrPatcher.setEnabled(Optional.of(false));
-        dcrPatcher.setOpenRegistrationEnabled(Optional.of(true));
+        PatchClientRegistrationSettings dcrPatcher = new PatchClientRegistrationSettings();
+        dcrPatcher.setDynamicClientRegistrationEnabled(Optional.of(false));
+        dcrPatcher.setOpenDynamicClientRegistrationEnabled(Optional.of(true));
         dcrPatcher.setAllowLocalhostRedirectUri(Optional.of(false));
         dcrPatcher.setAllowHttpSchemeRedirectUri(Optional.of(true));
         dcrPatcher.setAllowWildCardRedirectUri(Optional.of(false));
-        patcher.setDynamicClientRegistration(Optional.of(dcrPatcher));
+        patcher.setClientRegistrationSettings(Optional.of(dcrPatcher));
 
         //apply patch
         OIDCSettings result = patcher.patch(toPatch);
 
         assertNotNull(result);
-        assertNotNull(result.getDynamicClientRegistration());
-        assertFalse(result.getDynamicClientRegistration().isEnabled());
-        assertTrue(result.getDynamicClientRegistration().isOpenRegistrationEnabled());
-        assertFalse(result.getDynamicClientRegistration().isAllowLocalhostRedirectUri());
-        assertTrue(result.getDynamicClientRegistration().isAllowHttpSchemeRedirectUri());
-        assertFalse(result.getDynamicClientRegistration().isAllowWildCardRedirectUri());
+        assertNotNull(result.getClientRegistrationSettings());
+        assertFalse(result.getClientRegistrationSettings().isDynamicClientRegistrationEnabled());
+        assertTrue(result.getClientRegistrationSettings().isOpenDynamicClientRegistrationEnabled());
+        assertFalse(result.getClientRegistrationSettings().isAllowLocalhostRedirectUri());
+        assertTrue(result.getClientRegistrationSettings().isAllowHttpSchemeRedirectUri());
+        assertFalse(result.getClientRegistrationSettings().isAllowWildCardRedirectUri());
     }
 }

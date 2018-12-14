@@ -64,16 +64,16 @@ export class DomainSettingsOpenidClientRegistrationComponent implements OnInit {
   }
 
   canUpdateClients() {
-    this.clientDcrDisabled = !this.domain.oidc.dynamicClientRegistration.enabled; //Disable toogle only if dcr is not enabled.
-    this.disableToolTip = this.domain.oidc.dynamicClientRegistration.enabled;//Disable tooltip if dcr is enabled.
+    this.clientDcrDisabled = !this.domain.oidc.clientRegistrationSettings.dynamicClientRegistrationEnabled; //Disable toogle only if dcr is not enabled.
+    this.disableToolTip = this.domain.oidc.clientRegistrationSettings.dynamicClientRegistrationEnabled;//Disable tooltip if dcr is enabled.
     if(!this.disableToolTip) {this.toolTipMessage = "This feature is not enabled on your domain.";}
   }
 
   enableDynamicClientRegistration(event) {
-    this.domain.oidc.dynamicClientRegistration.enabled = event.checked;
+    this.domain.oidc.clientRegistrationSettings.dynamicClientRegistrationEnabled = event.checked;
     //If disabled, ensure to disable open dynamic client registration too and disable clients toogle too.
     if(!event.checked) {
-      this.domain.oidc.dynamicClientRegistration.openRegistrationEnabled = event.checked;
+      this.domain.oidc.clientRegistrationSettings.openDynamicClientRegistrationEnabled = event.checked;
       this.clientDcrDisabled = !event.checked;
       this.disableToolTip = event.checked;
       this.toolTipMessage = "Disable until settings are saved and feature is enabled.";
@@ -82,26 +82,26 @@ export class DomainSettingsOpenidClientRegistrationComponent implements OnInit {
   }
 
   enableOpenDynamicClientRegistration(event) {
-    this.domain.oidc.dynamicClientRegistration.openRegistrationEnabled = event.checked;
+    this.domain.oidc.clientRegistrationSettings.openDynamicClientRegistrationEnabled = event.checked;
     //If enabled, ensure to enable dynamic client registration too.
     if(event.checked) {
-      this.domain.oidc.dynamicClientRegistration.enabled = event.checked;
+      this.domain.oidc.clientRegistrationSettings.dynamicClientRegistrationEnabled = event.checked;
     }
     this.formChanged = true;
   }
 
   allowLocalhostRedirectUri(event) {
-    this.domain.oidc.dynamicClientRegistration.allowLocalhostRedirectUri = event.checked;
+    this.domain.oidc.clientRegistrationSettings.allowLocalhostRedirectUri = event.checked;
     this.formChanged = true;
   }
 
   allowHttpSchemeRedirectUri(event) {
-    this.domain.oidc.dynamicClientRegistration.allowHttpSchemeRedirectUri = event.checked;
+    this.domain.oidc.clientRegistrationSettings.allowHttpSchemeRedirectUri = event.checked;
     this.formChanged = true;
   }
 
   allowWildCardRedirectUri(event) {
-    this.domain.oidc.dynamicClientRegistration.allowWildCardRedirectUri = event.checked;
+    this.domain.oidc.clientRegistrationSettings.allowWildCardRedirectUri = event.checked;
     this.formChanged = true;
   }
 

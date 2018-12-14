@@ -21,13 +21,13 @@ package io.gravitee.am.repository.mongodb.management.internal.model.oidc;
  */
 public class OIDCSettingsMongo {
 
-    private DynamicClientRegistrationSettingsMongo dynamicClientRegistration;
+    private ClientRegistrationSettingsMongo clientRegistrationSettings;
 
-    public DynamicClientRegistrationSettingsMongo getDynamicClientRegistration() {
-        return dynamicClientRegistration;
+    public ClientRegistrationSettingsMongo getClientRegistrationSettings() {
+        return clientRegistrationSettings;
     }
 
-    public void setDynamicClientRegistration(DynamicClientRegistrationSettingsMongo dynamicClientRegistration) {
-        this.dynamicClientRegistration = dynamicClientRegistration;
+    public void setClientRegistrationSettings(ClientRegistrationSettingsMongo clientRegistrationSettings) {
+        this.clientRegistrationSettings = clientRegistrationSettings;
     }
 }

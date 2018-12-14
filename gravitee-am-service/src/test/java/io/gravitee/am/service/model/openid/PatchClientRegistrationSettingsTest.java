@@ -15,7 +15,7 @@
  */
 package io.gravitee.am.service.model.openid;
 
-import io.gravitee.am.model.oidc.DynamicClientRegistrationSettings;
+import io.gravitee.am.model.oidc.ClientRegistrationSettings;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -30,15 +30,15 @@ import static org.junit.Assert.assertTrue;
  * @author GraviteeSource Team
  */
 @RunWith(JUnit4.class)
-public class PatchDCRSettingsTest {
+public class PatchClientRegistrationSettingsTest {
 
     @Test
     public void testPatchDefaultSettings() {
-        PatchDCRSettings emptySettings = new PatchDCRSettings();
-        DynamicClientRegistrationSettings result = emptySettings.patch(null);
+        PatchClientRegistrationSettings emptySettings = new PatchClientRegistrationSettings();
+        ClientRegistrationSettings result = emptySettings.patch(null);
 
-        assertFalse("should be disabled by default", result.isEnabled());
-        assertFalse("should be disabled by default", result.isOpenRegistrationEnabled());
+        assertFalse("should be disabled by default", result.isDynamicClientRegistrationEnabled());
+        assertFalse("should be disabled by default", result.isOpenDynamicClientRegistrationEnabled());
         assertFalse("should be disabled by default", result.isAllowLocalhostRedirectUri());
         assertFalse("should be disabled by default", result.isAllowLocalhostRedirectUri());
         assertFalse("should be disabled by default", result.isAllowWildCardRedirectUri());
@@ -46,19 +46,19 @@ public class PatchDCRSettingsTest {
 
     @Test
     public void testPatch() {
-        PatchDCRSettings patcher = new PatchDCRSettings();
-        patcher.setEnabled(Optional.of(false));
-        patcher.setOpenRegistrationEnabled(Optional.empty());
+        PatchClientRegistrationSettings patcher = new PatchClientRegistrationSettings();
+        patcher.setDynamicClientRegistrationEnabled(Optional.of(false));
+        patcher.setOpenDynamicClientRegistrationEnabled(Optional.empty());
 
-        DynamicClientRegistrationSettings toPatch = DynamicClientRegistrationSettings.defaultSettings();
-        toPatch.setEnabled(true);
-        toPatch.setOpenRegistrationEnabled(true);
+        ClientRegistrationSettings toPatch = ClientRegistrationSettings.defaultSettings();
+        toPatch.setDynamicClientRegistrationEnabled(true);
+        toPatch.setOpenDynamicClientRegistrationEnabled(true);
         toPatch.setAllowLocalhostRedirectUri(true);
 
-        DynamicClientRegistrationSettings result = patcher.patch(toPatch);
+        ClientRegistrationSettings result = patcher.patch(toPatch);
 
-        assertFalse("should be disabled by default", result.isEnabled());
-        assertFalse("should be disabled by default", result.isOpenRegistrationEnabled());
+        assertFalse("should be disabled by default", result.isDynamicClientRegistrationEnabled());
+        assertFalse("should be disabled by default", result.isOpenDynamicClientRegistrationEnabled());
         assertTrue("should be disabled by default", result.isAllowLocalhostRedirectUri());
     }
 }

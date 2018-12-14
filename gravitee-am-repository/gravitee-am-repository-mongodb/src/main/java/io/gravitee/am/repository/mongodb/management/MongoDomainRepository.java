@@ -22,13 +22,13 @@ import io.gravitee.am.model.common.event.Event;
 import io.gravitee.am.model.common.event.Payload;
 import io.gravitee.am.model.common.event.Type;
 import io.gravitee.am.model.login.LoginForm;
-import io.gravitee.am.model.oidc.DynamicClientRegistrationSettings;
+import io.gravitee.am.model.oidc.ClientRegistrationSettings;
 import io.gravitee.am.model.oidc.OIDCSettings;
 import io.gravitee.am.repository.management.api.DomainRepository;
 import io.gravitee.am.repository.mongodb.common.IdGenerator;
 import io.gravitee.am.repository.mongodb.management.internal.model.DomainMongo;
 import io.gravitee.am.repository.mongodb.management.internal.model.LoginFormMongo;
-import io.gravitee.am.repository.mongodb.management.internal.model.oidc.DynamicClientRegistrationSettingsMongo;
+import io.gravitee.am.repository.mongodb.management.internal.model.oidc.ClientRegistrationSettingsMongo;
 import io.gravitee.am.repository.mongodb.management.internal.model.oidc.OIDCSettingsMongo;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -204,22 +204,22 @@ public class MongoDomainRepository extends AbstractManagementMongoRepository imp
         }
 
         OIDCSettings oidcSettings = new OIDCSettings();
-        oidcSettings.setDynamicClientRegistration(convert(oidcMongo.getDynamicClientRegistration()));
+        oidcSettings.setClientRegistrationSettings(convert(oidcMongo.getClientRegistrationSettings()));
 
         return oidcSettings;
     }
 
-    private DynamicClientRegistrationSettings convert(DynamicClientRegistrationSettingsMongo dcrMongo) {
+    private ClientRegistrationSettings convert(ClientRegistrationSettingsMongo dcrMongo) {
         if(dcrMongo==null) {
             return null;
         }
 
-        DynamicClientRegistrationSettings result = new DynamicClientRegistrationSettings();
+        ClientRegistrationSettings result = new ClientRegistrationSettings();
         result.setAllowHttpSchemeRedirectUri(dcrMongo.isAllowHttpSchemeRedirectUri());
         result.setAllowLocalhostRedirectUri(dcrMongo.isAllowLocalhostRedirectUri());
         result.setAllowWildCardRedirectUri(dcrMongo.isAllowWildCardRedirectUri());
-        result.setEnabled(dcrMongo.isEnabled());
-        result.setOpenRegistrationEnabled(dcrMongo.isOpenRegistrationEnabled());
+        result.setDynamicClientRegistrationEnabled(dcrMongo.isDynamicClientRegistrationEnabled());
+        result.setOpenDynamicClientRegistrationEnabled(dcrMongo.isOpenDynamicClientRegistrationEnabled());
 
         return result;
     }
@@ -230,22 +230,22 @@ public class MongoDomainRepository extends AbstractManagementMongoRepository imp
         }
 
         OIDCSettingsMongo oidcSettings = new OIDCSettingsMongo();
-        oidcSettings.setDynamicClientRegistration(convert(oidc.getDynamicClientRegistration()));
+        oidcSettings.setClientRegistrationSettings(convert(oidc.getClientRegistrationSettings()));
 
         return oidcSettings;
     }
 
-    private DynamicClientRegistrationSettingsMongo convert(DynamicClientRegistrationSettings dcr) {
+    private ClientRegistrationSettingsMongo convert(ClientRegistrationSettings dcr) {
         if(dcr==null) {
             return null;
         }
 
-        DynamicClientRegistrationSettingsMongo result = new DynamicClientRegistrationSettingsMongo();
+        ClientRegistrationSettingsMongo result = new ClientRegistrationSettingsMongo();
         result.setAllowHttpSchemeRedirectUri(dcr.isAllowHttpSchemeRedirectUri());
         result.setAllowLocalhostRedirectUri(dcr.isAllowLocalhostRedirectUri());
         result.setAllowWildCardRedirectUri(dcr.isAllowWildCardRedirectUri());
-        result.setEnabled(dcr.isEnabled());
-        result.setOpenRegistrationEnabled(dcr.isOpenRegistrationEnabled());
+        result.setDynamicClientRegistrationEnabled(dcr.isDynamicClientRegistrationEnabled());
+        result.setOpenDynamicClientRegistrationEnabled(dcr.isOpenDynamicClientRegistrationEnabled());
 
         return result;
     }

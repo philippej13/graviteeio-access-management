@@ -21,19 +21,19 @@ package io.gravitee.am.model.oidc;
  */
 public class OIDCSettings {
 
-    private DynamicClientRegistrationSettings dynamicClientRegistration;
+    private ClientRegistrationSettings clientRegistrationSettings;
 
-    public DynamicClientRegistrationSettings getDynamicClientRegistration() {
-        return dynamicClientRegistration!=null?dynamicClientRegistration:DynamicClientRegistrationSettings.defaultSettings();
+    public ClientRegistrationSettings getClientRegistrationSettings() {
+        return clientRegistrationSettings!=null?clientRegistrationSettings: ClientRegistrationSettings.defaultSettings();
     }
 
-    public void setDynamicClientRegistration(DynamicClientRegistrationSettings dynamicClientRegistration) {
-        this.dynamicClientRegistration = dynamicClientRegistration;
+    public void setClientRegistrationSettings(ClientRegistrationSettings clientRegistrationSettings) {
+        this.clientRegistrationSettings = clientRegistrationSettings;
     }
 
     public static OIDCSettings defaultSettings() {
         OIDCSettings defaultSettings = new OIDCSettings();
-        defaultSettings.setDynamicClientRegistration(DynamicClientRegistrationSettings.defaultSettings());
+        defaultSettings.setClientRegistrationSettings(ClientRegistrationSettings.defaultSettings());
         return defaultSettings;
     }
 }

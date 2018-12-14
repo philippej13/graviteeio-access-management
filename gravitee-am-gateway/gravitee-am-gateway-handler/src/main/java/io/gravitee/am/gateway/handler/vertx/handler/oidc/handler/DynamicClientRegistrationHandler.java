@@ -62,8 +62,8 @@ public class DynamicClientRegistrationHandler implements Handler<RoutingContext>
         LOGGER.debug("Dynamic client registration handler");
 
         //1st check if dynamic client registration is enabled.
-        if(domain.getOidc()==null || domain.getOidc().getDynamicClientRegistration()==null ||
-                !domain.getOidc().getDynamicClientRegistration().isEnabled())
+        if(domain.getOidc()==null || domain.getOidc().getClientRegistrationSettings()==null ||
+                !domain.getOidc().getClientRegistrationSettings().isDynamicClientRegistrationEnabled())
         {
             LOGGER.debug("Dynamic client registration is disabled");
             context.fail(new ClientRegistrationDisabledException());
@@ -71,7 +71,7 @@ public class DynamicClientRegistrationHandler implements Handler<RoutingContext>
         }
 
         //Do not apply security check if open dynamic client registration is enabled.
-        if(domain.getOidc().getDynamicClientRegistration().isOpenRegistrationEnabled()) {
+        if(domain.getOidc().getClientRegistrationSettings().isOpenDynamicClientRegistrationEnabled()) {
             LOGGER.debug("Open Dynamic client registration is enabled");
             context.put("domain",domain.getId());
             context.next();

@@ -23,37 +23,45 @@
         <div class="domain-client-registration-state" fxLayout="column">
           <mat-slide-toggle
             (change)="enableDynamicClientRegistration($event)"
-            [checked]="domain.oidc.dynamicClientRegistration.enabled">
+            [checked]="domain.oidc.clientRegistrationSettings.dynamicClientRegistrationEnabled">
+            Enable/Disable Dynamic Client Registration.
           </mat-slide-toggle>
-          <mat-hint>Enable/Disable Dynamic Client Registration.</mat-hint>
+          <mat-hint>
+            Enable application owner to self register their application through an openid connect endpoint.<br>
+            The endpoint is available under the oidc Discovery service. <i>/.well-known/openid-configuration</i>
+          </mat-hint>
         </div>
         <div class="domain-client-registration-state" fxLayout="column">
           <mat-slide-toggle
             (change)="enableOpenDynamicClientRegistration($event)"
-            [checked]="domain.oidc.dynamicClientRegistration.openRegistrationEnabled">
+            [checked]="domain.oidc.clientRegistrationSettings.openDynamicClientRegistrationEnabled">
+            Enable/Disable Open Dynamic Client Registration
           </mat-slide-toggle>
-          <mat-hint>Enable/Disable Open Dynamic Client Registration.</mat-hint>
+          <mat-hint>Enable application owner to self register their application without needing to be authenticated.</mat-hint>
         </div>
         <div class="domain-client-registration-state" fxLayout="column">
           <mat-slide-toggle
             (change)="allowLocalhostRedirectUri($event)"
-            [checked]="domain.oidc.dynamicClientRegistration.allowLocalhostRedirectUri">
+            [checked]="domain.oidc.clientRegistrationSettings.allowLocalhostRedirectUri">
+            Allow localhost redirect uris.
           </mat-slide-toggle>
-          <mat-hint>Allow clients to register redirect_uris with localhost as host.</mat-hint>
+          <mat-hint>Allow clients to be registered with redirect_uris using localhost as host.</mat-hint>
         </div>
         <div class="domain-client-registration-state" fxLayout="column">
           <mat-slide-toggle
             (change)="allowHttpSchemeRedirectUri($event)"
-            [checked]="domain.oidc.dynamicClientRegistration.allowHttpSchemeRedirectUri">
+            [checked]="domain.oidc.clientRegistrationSettings.allowHttpSchemeRedirectUri">
+            Allow unsecured (http) redirect uris.
           </mat-slide-toggle>
-          <mat-hint>Allow clients to register redirect_uris with unsecured (http) scheme.</mat-hint>
+          <mat-hint>Allow clients to be registered with redirect_uris using unsecured (http) scheme.</mat-hint>
         </div>
         <div class="domain-client-registration-state" fxLayout="column">
           <mat-slide-toggle
             (change)="allowWildCardRedirectUri($event)"
-            [checked]="domain.oidc.dynamicClientRegistration.allowWildCardRedirectUri">
+            [checked]="domain.oidc.clientRegistrationSettings.allowWildCardRedirectUri">
+            Allow wildcards redirect_uris.
           </mat-slide-toggle>
-          <mat-hint>Allow clients to register redirect_uris containing wildcards.</mat-hint>
+          <mat-hint>Allow clients to be registered with redirect_uris containing wildcards.</mat-hint>
         </div>
         <div class="domain-client-registration-form-actions">
           <button mat-raised-button [disabled]="(!domainForm.valid || domainForm.pristine) && !formChanged" type="submit">SAVE</button>
@@ -62,12 +70,12 @@
     </div>
 
     <div class="domain-client-registration-description" fxFlex>
-      <h3>Dynamic Client Registration protocol</h3>
+      <h3>Client Registration</h3>
       <div class="domain-client-registration-description-content">
         <p>
-          This protocol define method for application owner to self register their application. These applications can be either first-party or third-party applications.
+          This section is used to define business rules regarding client (application) creation within the domain.
         </p>
-        <small>The registration endpoint is available in the oidc Discovery service. <i>under /.well-known/openid-configuration</i></small>
+        <small><i>For some security reasons, it is strongly recommended to not allow unsecured http scheme, localhost as well as wildcard in the redirect_uri.</i></small>
       </div>
     </div>
   </div>

@@ -13,39 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.gravitee.am.model.oidc;
+package io.gravitee.am.repository.mongodb.management.internal.model.oidc;
 
 /**
  * @author Alexandre FARIA (lusoalex at github.com)
  * @author GraviteeSource Team
  */
-public class DynamicClientRegistrationSettings {
+public class ClientRegistrationSettingsMongo {
 
-    /**
-     * Allow localhost host as redirect_uri
-     */
     private boolean allowLocalhostRedirectUri;
-
-    /**
-     * Allow unsecured http scheme into redirect_uri
-     */
     private boolean allowHttpSchemeRedirectUri;
-
-    /**
-     * Allow wildcard redirect uri
-     */
     private boolean allowWildCardRedirectUri;
-
-    /**
-     * Domain Dynamic Client Registration enabled
-     */
-    private boolean isEnabled;
-
-    /**
-     * Domain open Dynamic Client Registration enabled
-     */
-    private boolean isOpenRegistrationEnabled;
-
+    private boolean isDynamicClientRegistrationEnabled;
+    private boolean isOpenDynamicClientRegistrationEnabled;
 
     public boolean isAllowLocalhostRedirectUri() {
         return allowLocalhostRedirectUri;
@@ -63,20 +43,20 @@ public class DynamicClientRegistrationSettings {
         this.allowHttpSchemeRedirectUri = allowHttpSchemeRedirectUri;
     }
 
-    public boolean isEnabled() {
-        return isEnabled;
+    public boolean isDynamicClientRegistrationEnabled() {
+        return isDynamicClientRegistrationEnabled;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.isEnabled = enabled;
+    public void setDynamicClientRegistrationEnabled(boolean isDynamicClientRegistrationEnabled) {
+        this.isDynamicClientRegistrationEnabled = isDynamicClientRegistrationEnabled;
     }
 
-    public boolean isOpenRegistrationEnabled() {
-        return isOpenRegistrationEnabled;
+    public boolean isOpenDynamicClientRegistrationEnabled() {
+        return isOpenDynamicClientRegistrationEnabled;
     }
 
-    public void setOpenRegistrationEnabled(boolean openRegistrationEnabled) {
-        this.isOpenRegistrationEnabled = openRegistrationEnabled;
+    public void setOpenDynamicClientRegistrationEnabled(boolean isOpenDynamicClientRegistrationEnabled) {
+        this.isOpenDynamicClientRegistrationEnabled = isOpenDynamicClientRegistrationEnabled;
     }
 
     public boolean isAllowWildCardRedirectUri() {
@@ -85,10 +65,5 @@ public class DynamicClientRegistrationSettings {
 
     public void setAllowWildCardRedirectUri(boolean allowWildCardRedirectUri) {
         this.allowWildCardRedirectUri = allowWildCardRedirectUri;
-    }
-
-    public static DynamicClientRegistrationSettings defaultSettings() {
-        //By default all boolean are set to false.
-        return new DynamicClientRegistrationSettings();
     }
 }

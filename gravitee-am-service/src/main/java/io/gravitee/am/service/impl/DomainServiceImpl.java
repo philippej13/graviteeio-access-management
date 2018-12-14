@@ -397,31 +397,31 @@ public class DomainServiceImpl implements DomainService {
     public boolean isDynamicClientRegistrationEnabled(Domain domain) {
         return domain!=null &&
                 domain.getOidc()!=null &&
-                domain.getOidc().getDynamicClientRegistration()!=null &&
-                domain.getOidc().getDynamicClientRegistration().isEnabled();
+                domain.getOidc().getClientRegistrationSettings()!=null &&
+                domain.getOidc().getClientRegistrationSettings().isDynamicClientRegistrationEnabled();
     }
 
     @Override
     public boolean isRedirectUriLocalhostAllowed(Domain domain) {
         return domain!=null &&
                 domain.getOidc()!=null &&
-                domain.getOidc().getDynamicClientRegistration()!=null &&
-                domain.getOidc().getDynamicClientRegistration().isAllowLocalhostRedirectUri();
+                domain.getOidc().getClientRegistrationSettings()!=null &&
+                domain.getOidc().getClientRegistrationSettings().isAllowLocalhostRedirectUri();
     }
 
     @Override
     public boolean isRedirectUriUnsecuredHttpSchemeAllowed(Domain domain) {
         return domain!=null &&
                 domain.getOidc()!=null &&
-                domain.getOidc().getDynamicClientRegistration()!=null &&
-                domain.getOidc().getDynamicClientRegistration().isAllowHttpSchemeRedirectUri();
+                domain.getOidc().getClientRegistrationSettings()!=null &&
+                domain.getOidc().getClientRegistrationSettings().isAllowHttpSchemeRedirectUri();
     }
 
     @Override
     public boolean isRedirectUriWildcardAllowed(Domain domain) {
         return domain!=null &&
                 domain.getOidc()!=null &&
-                domain.getOidc().getDynamicClientRegistration()!=null &&
-                domain.getOidc().getDynamicClientRegistration().isAllowWildCardRedirectUri();
+                domain.getOidc().getClientRegistrationSettings()!=null &&
+                domain.getOidc().getClientRegistrationSettings().isAllowWildCardRedirectUri();
     }
 }

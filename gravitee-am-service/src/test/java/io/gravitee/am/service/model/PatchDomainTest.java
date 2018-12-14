@@ -16,9 +16,9 @@
 package io.gravitee.am.service.model;
 
 import io.gravitee.am.model.Domain;
-import io.gravitee.am.model.oidc.DynamicClientRegistrationSettings;
+import io.gravitee.am.model.oidc.ClientRegistrationSettings;
 import io.gravitee.am.model.oidc.OIDCSettings;
-import io.gravitee.am.service.model.openid.PatchDCRSettings;
+import io.gravitee.am.service.model.openid.PatchClientRegistrationSettings;
 import io.gravitee.am.service.model.openid.PatchOIDCSettings;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,12 +69,12 @@ public class PatchDomainTest {
         patch.setOidc(Optional.empty());
 
         //Build object to patch with DCR enabled
-        DynamicClientRegistrationSettings dcr = DynamicClientRegistrationSettings.defaultSettings();
+        ClientRegistrationSettings dcr = ClientRegistrationSettings.defaultSettings();
         OIDCSettings oidc = OIDCSettings.defaultSettings();
         Domain toPatch = new Domain();
 
-        dcr.setEnabled(true);
-        oidc.setDynamicClientRegistration(dcr);
+        dcr.setDynamicClientRegistrationEnabled(true);
+        oidc.setClientRegistrationSettings(dcr);
         toPatch.setOidc(oidc);
 
         //apply patch
@@ -83,17 +83,17 @@ public class PatchDomainTest {
         //check.
         assertNotNull("was expecting a domain",result);
         assertNotNull(result.getOidc());
-        assertNotNull(result.getOidc().getDynamicClientRegistration());
-        assertFalse("should have been disabled",result.getOidc().getDynamicClientRegistration().isEnabled());
+        assertNotNull(result.getOidc().getClientRegistrationSettings());
+        assertFalse("should have been disabled",result.getOidc().getClientRegistrationSettings().isDynamicClientRegistrationEnabled());
     }
 
     @Test
     public void testPatchWithEnabledOidc() {
         //Build patcher
-        PatchDCRSettings dcrPatcher = new PatchDCRSettings();
-        dcrPatcher.setEnabled(Optional.of(true));
+        PatchClientRegistrationSettings dcrPatcher = new PatchClientRegistrationSettings();
+        dcrPatcher.setDynamicClientRegistrationEnabled(Optional.of(true));
         PatchOIDCSettings oidcPatcher = new PatchOIDCSettings();
-        oidcPatcher.setDynamicClientRegistration(Optional.of(dcrPatcher));
+        oidcPatcher.setClientRegistrationSettings(Optional.of(dcrPatcher));
         PatchDomain patch = new PatchDomain();
         patch.setOidc(Optional.of(oidcPatcher));
 
@@ -107,7 +107,7 @@ public class PatchDomainTest {
         //check.
         assertNotNull("was expecting a domain",result);
         assertNotNull(result.getOidc());
-        assertNotNull(result.getOidc().getDynamicClientRegistration());
-        assertTrue("should have been enabled",result.getOidc().getDynamicClientRegistration().isEnabled());
+        assertNotNull(result.getOidc().getClientRegistrationSettings());
+        assertTrue("should have been enabled",result.getOidc().getClientRegistrationSettings().isDynamicClientRegistrationEnabled());
     }
 }

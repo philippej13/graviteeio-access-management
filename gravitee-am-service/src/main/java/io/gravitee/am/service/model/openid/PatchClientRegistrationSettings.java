@@ -15,7 +15,7 @@
  */
 package io.gravitee.am.service.model.openid;
 
-import io.gravitee.am.model.oidc.DynamicClientRegistrationSettings;
+import io.gravitee.am.model.oidc.ClientRegistrationSettings;
 import io.gravitee.am.service.utils.SetterUtils;
 
 import java.util.Optional;
@@ -24,9 +24,9 @@ import java.util.Optional;
  * @author Alexandre FARIA (lusoalex at github.com)
  * @author GraviteeSource Team
  */
-public class PatchDCRSettings {
+public class PatchClientRegistrationSettings {
 
-    public PatchDCRSettings() {}
+    public PatchClientRegistrationSettings() {}
 
     /**
      * Allow localhost host as redirect_uri
@@ -46,12 +46,12 @@ public class PatchDCRSettings {
     /**
      * Domain Dynamic Client Registration enabled
      */
-    private Optional<Boolean> isEnabled;
+    private Optional<Boolean> isDynamicClientRegistrationEnabled;
 
     /**
      * Domain open Dynamic Client Registration enabled
      */
-    private Optional<Boolean> isOpenRegistrationEnabled;
+    private Optional<Boolean> isOpenDynamicClientRegistrationEnabled;
 
 
     public Optional<Boolean> getAllowLocalhostRedirectUri() {
@@ -78,31 +78,31 @@ public class PatchDCRSettings {
         this.allowWildCardRedirectUri = allowWildCardRedirectUri;
     }
 
-    public Optional<Boolean> isEnabled() {
-        return isEnabled;
+    public Optional<Boolean> isDynamicClientRegistrationEnabled() {
+        return isDynamicClientRegistrationEnabled;
     }
 
-    public void setEnabled(Optional<Boolean> enabled) {
-        this.isEnabled = enabled;
+    public void setDynamicClientRegistrationEnabled(Optional<Boolean> isDynamicClientRegistrationEnabled) {
+        this.isDynamicClientRegistrationEnabled = isDynamicClientRegistrationEnabled;
     }
 
-    public Optional<Boolean> isOpenRegistrationEnabled() {
-        return isOpenRegistrationEnabled;
+    public Optional<Boolean> isOpenDynamicClientRegistrationEnabled() {
+        return isOpenDynamicClientRegistrationEnabled;
     }
 
-    public void setOpenRegistrationEnabled(Optional<Boolean> openRegistrationEnabled) {
-        this.isOpenRegistrationEnabled = openRegistrationEnabled;
+    public void setOpenDynamicClientRegistrationEnabled(Optional<Boolean> isOpenDynamicClientRegistrationEnabled) {
+        this.isOpenDynamicClientRegistrationEnabled = isOpenDynamicClientRegistrationEnabled;
     }
 
 
-    public DynamicClientRegistrationSettings patch(DynamicClientRegistrationSettings toPatch) {
-        DynamicClientRegistrationSettings result=toPatch!=null?toPatch:DynamicClientRegistrationSettings.defaultSettings();
+    public ClientRegistrationSettings patch(ClientRegistrationSettings toPatch) {
+        ClientRegistrationSettings result=toPatch!=null?toPatch: ClientRegistrationSettings.defaultSettings();
 
         SetterUtils.safeSet(result::setAllowWildCardRedirectUri, this.getAllowWildCardRedirectUri(), boolean.class);
         SetterUtils.safeSet(result::setAllowHttpSchemeRedirectUri, this.getAllowHttpSchemeRedirectUri(), boolean.class);
         SetterUtils.safeSet(result::setAllowLocalhostRedirectUri, this.getAllowLocalhostRedirectUri(), boolean.class);
-        SetterUtils.safeSet(result::setOpenRegistrationEnabled, this.isOpenRegistrationEnabled, boolean.class);
-        SetterUtils.safeSet(result::setEnabled,this.isEnabled, boolean.class);
+        SetterUtils.safeSet(result::setOpenDynamicClientRegistrationEnabled, this.isOpenDynamicClientRegistrationEnabled(), boolean.class);
+        SetterUtils.safeSet(result::setDynamicClientRegistrationEnabled,this.isDynamicClientRegistrationEnabled(), boolean.class);
 
         return result;
     }

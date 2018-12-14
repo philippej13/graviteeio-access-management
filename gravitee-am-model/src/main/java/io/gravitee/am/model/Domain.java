@@ -175,7 +175,7 @@ public class Domain {
     }
 
     public OIDCSettings getOidc() {
-        return oidc!=null?oidc:OIDCSettings.defaultSettings();
+        return oidc;
     }
 
     public void setOidc(OIDCSettings oidc) {

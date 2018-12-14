@@ -64,7 +64,7 @@ public class DynamicClientRegistrationHandlerTest {
     @Test
     public void testWithOidcDcrDisabled() {
         OIDCSettings disabled = OIDCSettings.defaultSettings();
-        disabled.getDynamicClientRegistration().setEnabled(false);
+        disabled.getClientRegistrationSettings().setDynamicClientRegistrationEnabled(false);
 
         Domain domain = Mockito.mock(Domain.class);
         when(domain.getOidc()).thenReturn(disabled);
@@ -83,8 +83,8 @@ public class DynamicClientRegistrationHandlerTest {
     @Test
     public void testWithOidcDcrEnabled_openDcrEnabled() {
         OIDCSettings openDcr = OIDCSettings.defaultSettings();
-        openDcr.getDynamicClientRegistration().setEnabled(true);
-        openDcr.getDynamicClientRegistration().setOpenRegistrationEnabled(true);
+        openDcr.getClientRegistrationSettings().setDynamicClientRegistrationEnabled(true);
+        openDcr.getClientRegistrationSettings().setOpenDynamicClientRegistrationEnabled(true);
 
         Domain domain = Mockito.mock(Domain.class);
         when(domain.getOidc()).thenReturn(openDcr);
@@ -103,8 +103,8 @@ public class DynamicClientRegistrationHandlerTest {
     @Test
     public void testWithOidcDcrEnabled_notAuthenticated() {
         OIDCSettings openDcr = OIDCSettings.defaultSettings();
-        openDcr.getDynamicClientRegistration().setEnabled(true);
-        openDcr.getDynamicClientRegistration().setOpenRegistrationEnabled(false);
+        openDcr.getClientRegistrationSettings().setDynamicClientRegistrationEnabled(true);
+        openDcr.getClientRegistrationSettings().setOpenDynamicClientRegistrationEnabled(false);
 
         Domain domain = Mockito.mock(Domain.class);
         when(domain.getOidc()).thenReturn(openDcr);
@@ -125,8 +125,8 @@ public class DynamicClientRegistrationHandlerTest {
     @Test
     public void testWithOidcDcrEnabled_authenticatedButTokenExpired() {
         OIDCSettings openDcr = OIDCSettings.defaultSettings();
-        openDcr.getDynamicClientRegistration().setEnabled(true);
-        openDcr.getDynamicClientRegistration().setOpenRegistrationEnabled(false);
+        openDcr.getClientRegistrationSettings().setDynamicClientRegistrationEnabled(true);
+        openDcr.getClientRegistrationSettings().setOpenDynamicClientRegistrationEnabled(false);
 
         Domain domain = Mockito.mock(Domain.class);
         when(domain.getOidc()).thenReturn(openDcr);
@@ -154,8 +154,8 @@ public class DynamicClientRegistrationHandlerTest {
     @Test
     public void testWithOidcDcrEnabled_authenticatedButClientNotFound() {
         OIDCSettings openDcr = OIDCSettings.defaultSettings();
-        openDcr.getDynamicClientRegistration().setEnabled(true);
-        openDcr.getDynamicClientRegistration().setOpenRegistrationEnabled(false);
+        openDcr.getClientRegistrationSettings().setDynamicClientRegistrationEnabled(true);
+        openDcr.getClientRegistrationSettings().setOpenDynamicClientRegistrationEnabled(false);
 
         Domain domain = Mockito.mock(Domain.class);
         when(domain.getOidc()).thenReturn(openDcr);
@@ -186,8 +186,8 @@ public class DynamicClientRegistrationHandlerTest {
     @Test
     public void testWithOidcDcrEnabled_authenticatedButClientDcrDisabled() {
         OIDCSettings openDcr = OIDCSettings.defaultSettings();
-        openDcr.getDynamicClientRegistration().setEnabled(true);
-        openDcr.getDynamicClientRegistration().setOpenRegistrationEnabled(false);
+        openDcr.getClientRegistrationSettings().setDynamicClientRegistrationEnabled(true);
+        openDcr.getClientRegistrationSettings().setOpenDynamicClientRegistrationEnabled(false);
 
         Domain domain = Mockito.mock(Domain.class);
         when(domain.getOidc()).thenReturn(openDcr);
@@ -218,8 +218,8 @@ public class DynamicClientRegistrationHandlerTest {
     @Test
     public void testWithOidcDcrEnabled_authenticatedAndClientDcrEnabled() {
         OIDCSettings openDcr = OIDCSettings.defaultSettings();
-        openDcr.getDynamicClientRegistration().setEnabled(true);
-        openDcr.getDynamicClientRegistration().setOpenRegistrationEnabled(false);
+        openDcr.getClientRegistrationSettings().setDynamicClientRegistrationEnabled(true);
+        openDcr.getClientRegistrationSettings().setOpenDynamicClientRegistrationEnabled(false);
 
         Domain domain = Mockito.mock(Domain.class);
         when(domain.getOidc()).thenReturn(openDcr);

@@ -16,7 +16,7 @@
 package io.gravitee.am.service.model.openid;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.gravitee.am.model.oidc.DynamicClientRegistrationSettings;
+import io.gravitee.am.model.oidc.ClientRegistrationSettings;
 import io.gravitee.am.model.oidc.OIDCSettings;
 import java.util.Optional;
 
@@ -28,15 +28,15 @@ public class PatchOIDCSettings {
 
     public PatchOIDCSettings() {}
 
-    @JsonProperty("dynamicClientRegistration")
-    private Optional<PatchDCRSettings> dynamicClientRegistration;
+    @JsonProperty("clientRegistrationSettings")
+    private Optional<PatchClientRegistrationSettings> clientRegistrationSettings;
 
-    public Optional<PatchDCRSettings> getDynamicClientRegistration() {
-        return dynamicClientRegistration;
+    public Optional<PatchClientRegistrationSettings> getClientRegistrationSettings() {
+        return clientRegistrationSettings;
     }
 
-    public void setDynamicClientRegistration(Optional<PatchDCRSettings> dynamicClientRegistration) {
-        this.dynamicClientRegistration = dynamicClientRegistration;
+    public void setClientRegistrationSettings(Optional<PatchClientRegistrationSettings> clientRegistrationSettings) {
+        this.clientRegistrationSettings = clientRegistrationSettings;
     }
 
     public OIDCSettings patch(OIDCSettings toPatch) {
@@ -44,14 +44,14 @@ public class PatchOIDCSettings {
         //If source may be null, in such case init with default values
         OIDCSettings result=toPatch!=null?toPatch:OIDCSettings.defaultSettings();
 
-        if(getDynamicClientRegistration()!=null) {
+        if(getClientRegistrationSettings()!=null) {
             //If present apply settings, else return default settings.
-            if(getDynamicClientRegistration().isPresent()) {
-                PatchDCRSettings patcher = getDynamicClientRegistration().get();
-                DynamicClientRegistrationSettings source = result.getDynamicClientRegistration();
-                result.setDynamicClientRegistration(patcher.patch(source));
+            if(getClientRegistrationSettings().isPresent()) {
+                PatchClientRegistrationSettings patcher = getClientRegistrationSettings().get();
+                ClientRegistrationSettings source = result.getClientRegistrationSettings();
+                result.setClientRegistrationSettings(patcher.patch(source));
             } else {
-                result.setDynamicClientRegistration(DynamicClientRegistrationSettings.defaultSettings());
+                result.setClientRegistrationSettings(ClientRegistrationSettings.defaultSettings());
             }
         }
 
