@@ -44,12 +44,6 @@ public class JwkServiceImpl implements JwkService {
         try{
             return client.getAbs(UriBuilder.fromHttpUrl(jwksUri).build().toString())
                     .rxSend()
-                    .flatMap(response -> {
-                        if(response.statusCode()!=200) {
-                            return Single.error(new InvalidClientMetadataException("Uri not reachable: " + jwksUri));
-                        }
-                        return Single.just(response);
-                    })
                     .map(HttpResponse::bodyAsString)
                     .map(new JWKSetDeserializer()::convert)
                     .flatMapMaybe(jwkSet -> {
@@ -57,7 +51,8 @@ public class JwkServiceImpl implements JwkService {
                             return Maybe.just(jwkSet.get());
                         }
                         return Maybe.empty();
-                    });
+                    })
+                    .onErrorResumeNext(Maybe.error(new InvalidClientMetadataException("Unable to parse jwks from : " + jwksUri)));
         }
         catch(IllegalArgumentException | URISyntaxException ex) {
             return Maybe.error(new InvalidClientMetadataException(jwksUri+" is not valid."));

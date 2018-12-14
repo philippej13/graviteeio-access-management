@@ -195,14 +195,9 @@ public class DynamicClientRegistrationServiceImpl implements DynamicClientRegist
 
             return client.getAbs(uri.toString())
                     .rxSend()
-                    .flatMap(response -> {
-                        if(response.statusCode()!=200) {
-                            return Single.error(new InvalidClientMetadataException("Uri not reachable: " + uri.toString()));
-                        }
-                        return Single.just(response);
-                    })
                     .map(HttpResponse::bodyAsString)
                     .map(JsonArray::new)
+                    .onErrorResumeNext(Single.error(new InvalidClientMetadataException("Unable to parse sector_identifier_uri : "+ uri.toString())))
                     .flatMapPublisher(Flowable::fromIterable)
                     .cast(String.class)
                     .collect(HashSet::new,(set, value)->set.add(value))
