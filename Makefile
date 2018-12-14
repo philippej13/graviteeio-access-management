@@ -80,15 +80,23 @@ certificate: ## Generate certificate that can be used
 clean: # remove .working directory
 	@rm -rf .working/gateway
 	@rm -rf .working/management-api
-	@rm -f .working/.version
 
 version: # Get version and save it into a file
+	@mkdir -p .working
+	@rm -f .working/.version
 	@echo "$(shell mvn -o org.apache.maven.plugins:maven-help-plugin:2.1.1:evaluate -Dexpression=project.version 2> /dev/null | grep -v '\[')" > .working/.version
 
-install: clean version ## Compile, test, package then Set up working folder, you can skip test by doing : make OPTIONS=-DskipTests install
+install: clean ## Compile, test, package then Set up working folder, you can skip test by doing : make OPTIONS=-DskipTests install
+ifeq ($(GIO_AM_VERSION),)
+	@echo "no version found, retrieving current maven version"
+	@make version
+	@make install
+else
+	@echo "Current build version is : $(GIO_AM_VERSION)"
 	@mvn clean install -pl '!gravitee-am-ui' $(OPTIONS)
 	@$(foreach project,gateway management-api, $(call prepare,$(project));)
 	@$(call addDefaultIssuer,gateway, "http://gateway:8092/dcr/oidc");
+endif
 
 build: # Build docker images (require install to be run before)
 	cd .working/gateway && docker build --build-arg GRAVITEEAM_VERSION=$(GIO_AM_VERSION) -t $(GIO_AM_GATEWAY_IMAGE):$(GIO_AM_VERSION) .
