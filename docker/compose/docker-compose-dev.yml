@@ -16,9 +16,6 @@
 
 version: '2'
 
-volumes:
-  datamongo: {}
-
 services:
 
   mongodb:
@@ -27,7 +24,7 @@ services:
     ports:
     - 27017:27017
     volumes:
-      - datamongo:/data/db
+      - ./data/am-mongodb:/data/db
       - ./logs/am-mongodb:/var/log/mongodb
 
   gateway:
