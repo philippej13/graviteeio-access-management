@@ -148,6 +148,7 @@ stopAll: stop oidctest-stop ## Stop all running containers
 
 deleteContainer: # delete image
 	@cd .working/compose ; docker-compose down
+	@cd .working/oidctest/docker ; docker-compose down
 
 deleteImage: # delete image
 	@docker rmi -f $(GIO_AM_GATEWAY_IMAGE):$(GIO_AM_VERSION)
