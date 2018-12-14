@@ -58,7 +58,7 @@ public class MongoClientRepository extends AbstractManagementMongoRepository imp
     private static final String FIELD_IDENTITIES = "identities";
     private static final String FIELD_OAUTH2_IDENTITIES = "oauth2Identities";
     private static final String FIELD_CERTIFICATE = "certificate";
-    private static final String FIELD_GRANT_TYPES= "grantTypes";
+    private static final String FIELD_GRANT_TYPES= "authorizedGrantTypes";
     private MongoCollection<ClientMongo> clientsCollection;
 
     @Autowired
@@ -191,7 +191,7 @@ public class MongoClientRepository extends AbstractManagementMongoRepository imp
         client.setDefaultACRvalues(clientMongo.getDefaultACRvalues());
         client.setInitiateLoginUri( clientMongo.getInitiateLoginUri());
         client.setRequestUris(clientMongo.getRequestUris());
-        client.setScope(clientMongo.getScope());
+        client.setScopes(clientMongo.getScopes());
         client.setSoftwareId(clientMongo.getSoftwareId());
         client.setSoftwareVersion(clientMongo.getSoftwareVersion());
         client.setSoftwareStatement(clientMongo.getSoftwareStatement());
@@ -204,7 +204,7 @@ public class MongoClientRepository extends AbstractManagementMongoRepository imp
         client.setIdentities(clientMongo.getIdentities());
         client.setOauth2Identities(clientMongo.getOauth2Identities());
         client.setDomain(clientMongo.getDomain());
-        client.setGrantTypes(clientMongo.getGrantTypes());
+        client.setAuthorizedGrantTypes(clientMongo.getAuthorizedGrantTypes());
         client.setIdTokenValiditySeconds(clientMongo.getIdTokenValiditySeconds());
         client.setIdTokenCustomClaims(clientMongo.getIdTokenCustomClaims());
         client.setCertificate(clientMongo.getCertificate());
@@ -227,7 +227,7 @@ public class MongoClientRepository extends AbstractManagementMongoRepository imp
         clientMongo.setAccessTokenValiditySeconds(client.getAccessTokenValiditySeconds());
         clientMongo.setRefreshTokenValiditySeconds(client.getRefreshTokenValiditySeconds());
         clientMongo.setRedirectUris(client.getRedirectUris());
-        clientMongo.setGrantTypes(client.getGrantTypes());
+        clientMongo.setAuthorizedGrantTypes(client.getAuthorizedGrantTypes());
         clientMongo.setResponseTypes(client.getResponseTypes());
         clientMongo.setApplicationType(client.getApplicationType());
         clientMongo.setContacts(client.getContacts());
@@ -256,7 +256,7 @@ public class MongoClientRepository extends AbstractManagementMongoRepository imp
         clientMongo.setDefaultACRvalues(client.getDefaultACRvalues());
         clientMongo.setInitiateLoginUri(client.getInitiateLoginUri());
         clientMongo.setRequestUris(client.getRequestUris());
-        clientMongo.setScope(client.getScope());
+        clientMongo.setScopes(client.getScopes());
         clientMongo.setSoftwareId(client.getSoftwareId());
         clientMongo.setSoftwareVersion(client.getSoftwareVersion());
         clientMongo.setSoftwareStatement(client.getSoftwareStatement());

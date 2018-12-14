@@ -72,8 +72,8 @@ public class AbstractTokenGranter implements TokenGranter {
      */
     protected Single<TokenRequest> parseRequest(TokenRequest tokenRequest, Client client) {
         // Is client allowed to use such grant type ?
-        if (client.getGrantTypes() != null && !client.getGrantTypes().isEmpty()
-                && !client.getGrantTypes().contains(grantType)) {
+        if (client.getAuthorizedGrantTypes() != null && !client.getAuthorizedGrantTypes().isEmpty()
+                && !client.getAuthorizedGrantTypes().contains(grantType)) {
             throw new UnauthorizedClientException("Unauthorized grant type: " + grantType);
         }
         return Single.just(tokenRequest);
@@ -130,7 +130,7 @@ public class AbstractTokenGranter implements TokenGranter {
     }
 
     private boolean isSupportRefreshToken(Client client) {
-        return supportRefreshToken && client.getGrantTypes().contains(GrantType.REFRESH_TOKEN);
+        return supportRefreshToken && client.getAuthorizedGrantTypes().contains(GrantType.REFRESH_TOKEN);
     }
 
     public TokenRequestResolver getTokenRequestResolver() {

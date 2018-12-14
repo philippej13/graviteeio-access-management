@@ -48,7 +48,7 @@ public class Client {
 
     private List<String> redirectUris;
 
-    private List<String> grantTypes = DEFAULT_GRANT_TYPES;
+    private List<String> authorizedGrantTypes = DEFAULT_GRANT_TYPES;
 
     private List<String> responseTypes = DEFAULT_RESPONSE_TYPES;
 
@@ -107,7 +107,7 @@ public class Client {
 
     private List<String> requestUris;
 
-    private List<String> scope;
+    private List<String> scopes;
 
     private String softwareId; //Should be UUID
 
@@ -195,11 +195,11 @@ public class Client {
         this.redirectUris = redirectUris;
     }
 
-    public List<String> getGrantTypes() {
-        return grantTypes;
+    public List<String> getAuthorizedGrantTypes() {
+        return authorizedGrantTypes;
     }
 
-    public void setGrantTypes(List<String> grantTypes) { this.grantTypes = grantTypes; }
+    public void setAuthorizedGrantTypes(List<String> grantTypes) { this.authorizedGrantTypes = grantTypes; }
 
     public List<String> getResponseTypes() {
         return responseTypes;
@@ -425,12 +425,12 @@ public class Client {
         this.requestUris = requestUris;
     }
 
-    public List<String> getScope() {
-        return scope;
+    public List<String> getScopes() {
+        return scopes;
     }
 
-    public void setScope(List<String> scope) {
-        this.scope = scope;
+    public void setScopes(List<String> scopes) {
+        this.scopes = scopes;
     }
 
     public String getSoftwareId() {

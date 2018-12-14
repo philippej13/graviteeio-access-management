@@ -37,7 +37,7 @@ public class DynamicClientRegistrationRequestTest {
         toPatch.setClientName("oldName");
         toPatch.setClientSecret("expectedSecret");
         toPatch.setClientUri("shouldDisappear");
-        toPatch.setScope(Arrays.asList("scopeA","scopeB"));
+        toPatch.setScopes(Arrays.asList("scopeA","scopeB"));
         toPatch.setAccessTokenValiditySeconds(7200);
         toPatch.setRefreshTokenValiditySeconds(3600);
         toPatch.setResponseTypes(Arrays.asList("old","old2"));
@@ -61,8 +61,8 @@ public class DynamicClientRegistrationRequestTest {
         assertNull("Client uri should have been erased",result.getClientUri());
         assertEquals("Access token validity should have been kept",7200,result.getAccessTokenValiditySeconds());
         assertEquals("Refresh token validity should have been kept",3600, result.getRefreshTokenValiditySeconds());
-        assertArrayEquals("Grant types should have been replaced",Arrays.asList("grant1","grant2").toArray(),result.getGrantTypes().toArray());
+        assertArrayEquals("Grant types should have been replaced",Arrays.asList("grant1","grant2").toArray(),result.getAuthorizedGrantTypes().toArray());
         assertArrayEquals("Response type should have been replaced by default falues",Arrays.asList("code").toArray(),result.getResponseTypes().toArray());
-        assertArrayEquals("Scopes should have been replaced",Arrays.asList("scope1","scope2").toArray(), result.getScope().toArray());
+        assertArrayEquals("Scopes should have been replaced",Arrays.asList("scope1","scope2").toArray(), result.getScopes().toArray());
     }
 }

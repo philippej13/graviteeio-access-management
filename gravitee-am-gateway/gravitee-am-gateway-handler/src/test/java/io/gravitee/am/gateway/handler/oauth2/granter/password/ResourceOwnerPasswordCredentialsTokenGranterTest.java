@@ -75,7 +75,7 @@ public class ResourceOwnerPasswordCredentialsTokenGranterTest {
 
         Client client = new Client();
         client.setClientId("my-client-id");
-        client.setGrantTypes(Arrays.asList(new String[]{"password"}));
+        client.setAuthorizedGrantTypes(Arrays.asList(new String[]{"password"}));
 
         Token accessToken = new AccessToken("test-token");
 

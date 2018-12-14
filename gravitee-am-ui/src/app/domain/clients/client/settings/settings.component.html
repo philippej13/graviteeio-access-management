@@ -45,7 +45,7 @@
 
     <h4 style="margin-bottom: 5px;">Grant types</h4>
     <mat-hint style="font-size: 75%; margin-bottom: 20px;">OAuth 2.0 grant types used by the client to obtain an access token. Each grant type is specific to a type of application.</mat-hint>
-    <mat-checkbox *ngFor="let grantType of grantTypesList"
+    <mat-checkbox *ngFor="let grantType of grantTypes"
                  name="grantTypes"
                  value="{{grantType.value}}"
                  [checked]="grantType.checked"
@@ -101,7 +101,7 @@
         </mat-chip-list>
 
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addScope($event)">
-        <mat-option *ngFor="let scope of scopeList" [value]="scope.key">
+        <mat-option *ngFor="let scope of scopes" [value]="scope.key">
           <mat-icon style="vertical-align:middle;">donut_large</mat-icon>
           <span>{{ scope.key }}</span> | <small>{{scope.name}}</small>
         </mat-option>

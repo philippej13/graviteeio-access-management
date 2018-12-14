@@ -54,7 +54,7 @@ public class TokenRequestResolverTest {
         tokenRequest.setScopes(new HashSet<>(Arrays.asList(scope, userScope)));
         Client client = new Client();
         client.setEnhanceScopesWithUserPermissions(true);
-        client.setScope(Collections.singletonList(scope));
+        client.setScopes(Collections.singletonList(scope));
 
         User user = new User();
         Role role = new Role();
@@ -82,7 +82,7 @@ public class TokenRequestResolverTest {
         TokenRequest tokenRequest = new TokenRequest();
         tokenRequest.setScopes(Collections.singleton(scope));
         Client client = new Client();
-        client.setScope(Collections.singletonList("write"));
+        client.setScopes(Collections.singletonList("write"));
 
         TestObserver<TokenRequest> testObserver = tokenRequestResolver.resolve(tokenRequest, client, null).test();
         testObserver.assertNotComplete();
@@ -95,7 +95,7 @@ public class TokenRequestResolverTest {
         TokenRequest tokenRequest = new TokenRequest();
         tokenRequest.setScopes(Collections.singleton(scope));
         Client client = new Client();
-        client.setScope(Collections.singletonList("write"));
+        client.setScopes(Collections.singletonList("write"));
 
         User user = new User();
         Role role = new Role();
@@ -113,7 +113,7 @@ public class TokenRequestResolverTest {
         TokenRequest authorizationRequest = new TokenRequest();
 
         Client client = new Client();
-        client.setScope(Collections.singletonList(scope));
+        client.setScopes(Collections.singletonList(scope));
 
         TestObserver<TokenRequest> testObserver = tokenRequestResolver.resolve(authorizationRequest, client, null).test();
         testObserver.assertComplete();

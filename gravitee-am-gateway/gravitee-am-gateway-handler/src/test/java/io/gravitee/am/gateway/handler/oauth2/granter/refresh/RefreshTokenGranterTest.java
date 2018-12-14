@@ -17,16 +17,11 @@ package io.gravitee.am.gateway.handler.oauth2.granter.refresh;
 
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidGrantException;
 import io.gravitee.am.gateway.handler.oauth2.exception.InvalidRequestException;
-import io.gravitee.am.gateway.handler.oauth2.request.OAuth2Request;
 import io.gravitee.am.gateway.handler.oauth2.request.TokenRequest;
-import io.gravitee.am.gateway.handler.oauth2.token.Token;
 import io.gravitee.am.gateway.handler.oauth2.token.TokenService;
-import io.gravitee.am.gateway.handler.oauth2.token.impl.AccessToken;
 import io.gravitee.am.model.Client;
-import io.gravitee.am.repository.oauth2.model.RefreshToken;
 import io.gravitee.common.util.LinkedMultiValueMap;
 import io.reactivex.Single;
-import io.reactivex.observers.TestObserver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -62,7 +57,7 @@ public class RefreshTokenGranterTest {
 
         Client client = new Client();
         client.setClientId("my-client-id");
-        client.setGrantTypes(Arrays.asList(new String[]{"refresh_token"}));
+        client.setAuthorizedGrantTypes(Arrays.asList(new String[]{"refresh_token"}));
 
         OAuth2Request oAuth2Request = new OAuth2Request();
         oAuth2Request.setClientId("my-client-id");
@@ -104,7 +99,7 @@ public class RefreshTokenGranterTest {
 
         Client client = new Client();
         client.setClientId("my-client-id");
-        client.setGrantTypes(Arrays.asList(new String[]{"refresh_token"}));
+        client.setAuthorizedGrantTypes(Arrays.asList(new String[]{"refresh_token"}));
 
         when(tokenRequest.getClientId()).thenReturn("my-client-id");
         when(tokenRequest.getGrantType()).thenReturn("refresh_token");

@@ -71,7 +71,7 @@ public class TokenEndpointHandler implements Handler<RoutingContext> {
         }
 
         // check if client has authorized grant types
-        if (client.getGrantTypes() == null || client.getGrantTypes().isEmpty()) {
+        if (client.getAuthorizedGrantTypes() == null || client.getAuthorizedGrantTypes().isEmpty()) {
             throw new InvalidClientException("Invalid client: client must at least have one grant type configured");
         }
 

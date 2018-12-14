@@ -437,7 +437,7 @@ public class DynamicClientRegistrationRequest {
         /* set openid request metadata */
         SetterUtils.safeSet(client::setRedirectUris, this.getRedirectUris());
         SetterUtils.safeSetOrElse(client::setResponseTypes, this.getResponseTypes(), Client.DEFAULT_RESPONSE_TYPES);
-        SetterUtils.safeSetOrElse(client::setGrantTypes, this.getGrantTypes(), Client.DEFAULT_GRANT_TYPES);
+        SetterUtils.safeSetOrElse(client::setAuthorizedGrantTypes, this.getGrantTypes(), Client.DEFAULT_GRANT_TYPES);
         SetterUtils.safeSetOrElse(client::setApplicationType, this.getApplicationType(), ApplicationType.WEB);
         SetterUtils.safeSet(client::setContacts, this.getContacts());
         SetterUtils.safeSet(client::setClientName, this.getClientName());
@@ -468,7 +468,7 @@ public class DynamicClientRegistrationRequest {
         SetterUtils.safeSet(client::setRequestUris, this.getRequestUris());
 
         /* set oauth2 request metadata */
-        SetterUtils.safeSet(client::setScope, this.getScope());
+        SetterUtils.safeSet(client::setScopes, this.getScope());
         SetterUtils.safeSet(client::setSoftwareId, this.getSoftwareId());
         SetterUtils.safeSet(client::setSoftwareVersion, this.getSoftwareVersion());
         SetterUtils.safeSet(client::setSoftwareStatement, this.getSoftwareStatement());

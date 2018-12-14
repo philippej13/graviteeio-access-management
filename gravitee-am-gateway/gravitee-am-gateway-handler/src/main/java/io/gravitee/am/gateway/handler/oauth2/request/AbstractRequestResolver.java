@@ -45,7 +45,7 @@ public abstract class AbstractRequestResolver<R extends BaseRequest> {
      * @return the oauth 2.0 request
      */
     protected Single<R> resolveAuthorizedScopes(R request, Client client, User endUser) {
-        final List<String> clientScopes = client.getScope();
+        final List<String> clientScopes = client.getScopes();
         final Set<String> requestScopes = request.getScopes();
         Set<String> clientResolvedScopes = new HashSet<>();
         Set<String> resolvedScopes = new HashSet<>();

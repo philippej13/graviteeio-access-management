@@ -181,7 +181,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         router.route().order(-1).handler(routingContext -> {
@@ -209,7 +209,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
         authorizationRequest.setApproved(true);
@@ -234,7 +234,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Arrays.asList("http://redirect1", "http://redirect2"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -261,7 +261,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/authorize/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -288,7 +288,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
@@ -444,7 +444,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -477,7 +477,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -705,7 +705,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
@@ -748,7 +748,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
@@ -770,7 +770,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         when(clientSyncService.findByClientId("client-id")).thenReturn(Maybe.just(client));
@@ -827,7 +827,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();
@@ -870,7 +870,7 @@ public class AuthorizationEndpointHandlerTest  extends RxWebTestBase {
         final Client client = new Client();
         client.setId("client-id");
         client.setClientId("client-id");
-        client.setScope(Collections.singletonList("read"));
+        client.setScopes(Collections.singletonList("read"));
         client.setRedirectUris(Collections.singletonList("http://localhost:9999/callback"));
 
         AuthorizationRequest authorizationRequest = new AuthorizationRequest();

@@ -77,7 +77,7 @@ public class ScopeUpgraderTest {
 
         final Client client = new Client();
         client.setId("client-id");
-        client.setScope(Collections.singletonList(clientScope.getKey()));
+        client.setScopes(Collections.singletonList(clientScope.getKey()));
 
         final Scope roleScope = new Scope();
         roleScope.setId("role-scope-key");
@@ -170,7 +170,7 @@ public class ScopeUpgraderTest {
 
         final Client client = new Client();
         client.setId("client-id");
-        client.setScope(null);
+        client.setScopes(null);
 
         final Role role = new Role();
         role.setId("role-id");

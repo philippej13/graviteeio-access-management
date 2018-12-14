@@ -15,6 +15,7 @@
  */
 package io.gravitee.am.service;
 
+import io.gravitee.am.model.Client;
 import io.gravitee.am.service.impl.ResponseTypeServiceImpl;
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,4 +50,14 @@ public class ResponseTypeServiceTest {
         boolean isValid = this.responseTypeService.isValideResponseType(Arrays.asList());
         Assert.assertFalse("Were expecting to be false",isValid);
     }
+
+    @Test
+    public void applyDefaultResponseType() {
+        Client client = new Client();
+        client.setAuthorizedGrantTypes(Arrays.asList("authorization_code","implicit"));
+        client = this.responseTypeService.applyDefaultResponseType(client);
+
+        Assert.assertTrue("should contain code & token response type",client.getResponseTypes().containsAll(Arrays.asList("code","token")));
+    }
+
 }

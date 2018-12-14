@@ -59,42 +59,42 @@ public class GrantTypeServiceTest {
     public void testCompleteGrantTypeCorrespondance_missingCodeGrantType() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList("code"));
-        client.setGrantTypes(Arrays.asList());
+        client.setAuthorizedGrantTypes(Arrays.asList());
 
         client = this.grantTypeService.completeGrantTypeCorrespondance(client);
-        assertTrue("was expecting code grant type",client.getGrantTypes().contains("authorization_code"));
+        assertTrue("was expecting code grant type",client.getAuthorizedGrantTypes().contains("authorization_code"));
     }
 
     @Test
     public void testCompleteGrantTypeCorrespondance_missingImplicitGrantType() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList("id_token"));
-        client.setGrantTypes(Arrays.asList("authorization_code"));
+        client.setAuthorizedGrantTypes(Arrays.asList("authorization_code"));
 
         client = this.grantTypeService.completeGrantTypeCorrespondance(client);
-        assertTrue("was expecting code grant type",client.getGrantTypes().contains("implicit"));
-        assertFalse("was expecting code grant type",client.getGrantTypes().contains("authorization_code"));
+        assertTrue("was expecting code grant type",client.getAuthorizedGrantTypes().contains("implicit"));
+        assertFalse("was expecting code grant type",client.getAuthorizedGrantTypes().contains("authorization_code"));
     }
 
     @Test
     public void testCompleteGrantTypeCorrespondance_removeImplicitGrantType() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList("code"));
-        client.setGrantTypes(Arrays.asList("implicit"));
+        client.setAuthorizedGrantTypes(Arrays.asList("implicit"));
 
         client = this.grantTypeService.completeGrantTypeCorrespondance(client);
-        assertFalse("was expecting code grant type",client.getGrantTypes().contains("implicit"));
-        assertTrue("was expecting code grant type",client.getGrantTypes().contains("authorization_code"));
+        assertFalse("was expecting code grant type",client.getAuthorizedGrantTypes().contains("implicit"));
+        assertTrue("was expecting code grant type",client.getAuthorizedGrantTypes().contains("authorization_code"));
     }
 
     @Test
     public void testCompleteGrantTypeCorrespondance_caseAllEmpty() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList());
-        client.setGrantTypes(Arrays.asList());
+        client.setAuthorizedGrantTypes(Arrays.asList());
 
         client = this.grantTypeService.completeGrantTypeCorrespondance(client);
         assertTrue("was expecting code grant type",client.getResponseTypes().contains("code"));
-        assertTrue("was expecting code grant type",client.getGrantTypes().contains("authorization_code"));
+        assertTrue("was expecting code grant type",client.getAuthorizedGrantTypes().contains("authorization_code"));
     }
 }

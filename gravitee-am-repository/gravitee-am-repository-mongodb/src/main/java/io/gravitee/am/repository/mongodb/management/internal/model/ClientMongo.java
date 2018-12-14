@@ -39,7 +39,7 @@ public class ClientMongo extends Auditable {
 
     private List<String> redirectUris;
 
-    private List<String> grantTypes;
+    private List<String> authorizedGrantTypes;
 
     private List<String> responseTypes;
 
@@ -97,7 +97,7 @@ public class ClientMongo extends Auditable {
 
     private List<String> requestUris;
 
-    private List<String> scope;
+    private List<String> scopes;
 
     private String softwareId; //Should be UUID
 
@@ -188,12 +188,12 @@ public class ClientMongo extends Auditable {
         this.redirectUris = redirectUris;
     }
 
-    public List<String> getGrantTypes() {
-        return grantTypes;
+    public List<String> getAuthorizedGrantTypes() {
+        return authorizedGrantTypes;
     }
 
-    public void setGrantTypes(List<String> grantTypes) {
-        this.grantTypes = grantTypes;
+    public void setAuthorizedGrantTypes(List<String> authorizedGrantTypes) {
+        this.authorizedGrantTypes = authorizedGrantTypes;
     }
 
     public List<String> getResponseTypes() {
@@ -420,12 +420,12 @@ public class ClientMongo extends Auditable {
         this.requestUris = requestUris;
     }
 
-    public List<String> getScope() {
-        return scope;
+    public List<String> getScopes() {
+        return scopes;
     }
 
-    public void setScope(List<String> scope) {
-        this.scope = scope;
+    public void setScopes(List<String> scopes) {
+        this.scopes = scopes;
     }
 
     public String getSoftwareId() {

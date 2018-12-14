@@ -40,8 +40,8 @@ export class ClientService {
     return this.http.put(this.clientsURL + domainId + "/clients/" + id, {
       'clientName': client.clientName,
       'redirectUris': client.redirectUris,
-      'grantTypes': client.grantTypes,
-      'scope': client.scope,
+      'authorizedGrantTypes': client.authorizedGrantTypes,
+      'scopes': client.scopes,
       'autoApproveScopes': client.autoApproveScopes,
       'accessTokenValiditySeconds': client.accessTokenValiditySeconds,
       'refreshTokenValiditySeconds': client.refreshTokenValiditySeconds,

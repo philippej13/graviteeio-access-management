@@ -222,20 +222,20 @@ public class ScopeServiceImpl implements ScopeService {
                                         // 2_ Remove scopes from client
                                         clientService.findByDomain(scope.getDomain())
                                                 .flatMapObservable(clients -> Observable.fromIterable(clients.stream()
-                                                        .filter(client -> client.getScope().contains(scope.getKey()))
+                                                        .filter(client -> client.getScopes().contains(scope.getKey()))
                                                         .collect(Collectors.toList())))
                                                 .flatMapSingle(client -> {
                                                     // Remove scope from client
-                                                    client.getScope().remove(scope.getKey());
+                                                    client.getScopes().remove(scope.getKey());
 
                                                     UpdateClient updateClient = new UpdateClient();
                                                     updateClient.setClientName(client.getClientName());
                                                     updateClient.setAutoApproveScopes(client.getAutoApproveScopes());
-                                                    updateClient.setScope(client.getScope());
+                                                    updateClient.setScopes(client.getScopes());
                                                     updateClient.setRefreshTokenValiditySeconds(client.getRefreshTokenValiditySeconds());
                                                     updateClient.setRedirectUris(client.getRedirectUris());
                                                     updateClient.setAccessTokenValiditySeconds(client.getAccessTokenValiditySeconds());
-                                                    updateClient.setGrantTypes(client.getGrantTypes());
+                                                    updateClient.setAuthorizedGrantTypes(client.getAuthorizedGrantTypes());
                                                     updateClient.setCertificate(client.getCertificate());
                                                     updateClient.setEnabled(client.isEnabled());
                                                     updateClient.setEnhanceScopesWithUserPermissions(client.isEnhanceScopesWithUserPermissions());

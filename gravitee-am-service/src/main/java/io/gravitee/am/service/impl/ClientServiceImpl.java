@@ -28,6 +28,7 @@ import io.gravitee.am.service.ClientService;
 import io.gravitee.am.service.DomainService;
 import io.gravitee.am.service.GrantTypeService;
 import io.gravitee.am.service.IdentityProviderService;
+import io.gravitee.am.service.ResponseTypeService;
 import io.gravitee.am.service.ScopeService;
 import io.gravitee.am.service.exception.AbstractManagementException;
 import io.gravitee.am.service.exception.ClientAlreadyExistsException;
@@ -86,6 +87,9 @@ public class ClientServiceImpl implements ClientService {
     private GrantTypeService grantTypeService;
 
     @Autowired
+    private ResponseTypeService responseTypeService;
+
+    @Autowired
     private ScopeService scopeService;
 
 
@@ -96,8 +100,8 @@ public class ClientServiceImpl implements ClientService {
         return clientRepository.findById(id)
                 .map(client -> {
                     // Send an empty array in case of no grant types
-                    if (client.getGrantTypes() == null) {
-                        client.setGrantTypes(Collections.emptyList());
+                    if (client.getAuthorizedGrantTypes() == null) {
+                        client.setAuthorizedGrantTypes(Collections.emptyList());
                     }
                     return client;
                 })
@@ -339,11 +343,11 @@ public class ClientServiceImpl implements ClientService {
                 })
                 .map(client -> {
                     client.setClientName(updateClient.getClientName());
-                    client.setScope(updateClient.getScope());
+                    client.setScopes(updateClient.getScopes());
                     client.setAutoApproveScopes(updateClient.getAutoApproveScopes());
                     client.setAccessTokenValiditySeconds(updateClient.getAccessTokenValiditySeconds());
                     client.setRefreshTokenValiditySeconds(updateClient.getRefreshTokenValiditySeconds());
-                    client.setGrantTypes(updateClient.getGrantTypes());
+                    client.setAuthorizedGrantTypes(updateClient.getAuthorizedGrantTypes());
                     client.setRedirectUris(updateClient.getRedirectUris());
                     client.setEnabled(updateClient.isEnabled());
                     client.setIdentities(updateClient.getIdentities());
@@ -355,6 +359,7 @@ public class ClientServiceImpl implements ClientService {
                     client.setDynamicClientRegistrationEnabled(updateClient.isDynamicClientRegistrationEnabled());
                     return client;
                 })
+                .map(responseTypeService::applyDefaultResponseType)
                 .flatMap(client -> this.validateClientMetadata(domain, client))
                 .flatMap(client -> this.updateClientAndReloadDomain(domain, client))
                 .onErrorResumeNext(this::handleError);
@@ -432,7 +437,7 @@ public class ClientServiceImpl implements ClientService {
                     }
 
                     //Check scopes.
-                    return scopeService.validateScope(domainId, client.getScope());
+                    return scopeService.validateScope(domainId, client.getScopes());
                 })
                 .flatMap(isValid -> {
                     if (!isValid) {

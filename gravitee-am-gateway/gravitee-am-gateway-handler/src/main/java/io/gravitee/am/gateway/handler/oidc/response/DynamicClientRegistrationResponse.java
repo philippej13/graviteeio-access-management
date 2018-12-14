@@ -21,7 +21,6 @@ import io.gravitee.am.gateway.handler.oidc.jwk.ECKey;
 import io.gravitee.am.gateway.handler.oidc.jwk.JWK;
 import io.gravitee.am.gateway.handler.oidc.jwk.JWKSet;
 import io.gravitee.am.gateway.handler.oidc.jwk.RSAKey;
-import io.gravitee.am.gateway.handler.oidc.request.DynamicClientRegistrationRequest;
 import io.gravitee.am.model.Client;
 import io.gravitee.am.model.jose.KeyType;
 
@@ -575,7 +574,7 @@ public class DynamicClientRegistrationResponse {
 
         response.setRedirectUris(client.getRedirectUris());
         response.setResponseTypes(client.getResponseTypes());
-        response.setGrantTypes(client.getGrantTypes());
+        response.setGrantTypes(client.getAuthorizedGrantTypes());
         response.setApplicationType(client.getApplicationType());
         response.setContacts(client.getContacts());
         response.setClientName(client.getClientName());
@@ -603,7 +602,7 @@ public class DynamicClientRegistrationResponse {
         response.setDefaultACRvalues(client.getDefaultACRvalues());
         response.setInitiateLoginUri(client.getInitiateLoginUri());
         response.setRequestUris(client.getRequestUris());
-        response.setScope(client.getScope()!=null?String.join(SCOPE_DELIMITER,client.getScope()):null);
+        response.setScope(client.getScopes()!=null?String.join(SCOPE_DELIMITER,client.getScopes()):null);
         response.setSoftwareId(client.getSoftwareId());
         response.setSoftwareVersion(client.getSoftwareVersion());
         response.setSoftwareStatement(client.getSoftwareStatement());

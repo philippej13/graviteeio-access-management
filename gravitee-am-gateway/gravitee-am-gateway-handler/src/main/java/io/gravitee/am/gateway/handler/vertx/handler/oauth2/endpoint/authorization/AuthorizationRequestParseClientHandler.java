@@ -84,7 +84,7 @@ public class AuthorizationRequestParseClientHandler implements Handler<RoutingCo
 
     private void checkGrantTypes(Client client) {
         // Authorization endpoint implies that the client should at least have authorization_code ou implicit grant types.
-        List<String> authorizedGrantTypes = client.getGrantTypes();
+        List<String> authorizedGrantTypes = client.getAuthorizedGrantTypes();
         if (authorizedGrantTypes == null || authorizedGrantTypes.isEmpty()) {
             throw new UnauthorizedClientException("Client should at least have one authorized grand type");
         }

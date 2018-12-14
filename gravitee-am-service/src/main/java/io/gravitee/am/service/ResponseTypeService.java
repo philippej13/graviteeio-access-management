@@ -15,6 +15,8 @@
  */
 package io.gravitee.am.service;
 
+import io.gravitee.am.model.Client;
+
 import java.util.List;
 
 /**
@@ -34,4 +36,15 @@ public interface ResponseTypeService {
      * @param responseType String to response_type validate.
      */
     boolean isValideResponseType(String responseType);
+
+    /**
+     * Currently in the UI there's no response type settings on the client.
+     * So we will add default response type according to selected grant_type.
+     * authorization_code  : add code
+     * implicit            : add token
+     *
+     * @param client Client to analyse.
+     * @return Client updated Client
+     */
+    Client applyDefaultResponseType(Client client);
 }

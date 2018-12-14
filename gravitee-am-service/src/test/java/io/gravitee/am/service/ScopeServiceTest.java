@@ -34,7 +34,6 @@ import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatcher;
@@ -279,7 +278,7 @@ public class ScopeServiceTest {
 
         Client client = mock(Client.class);
         when(client.getId()).thenReturn("client-1");
-        when(client.getScope()).thenReturn(new LinkedList<>(Arrays.asList("my-scope")));
+        when(client.getScopes()).thenReturn(new LinkedList<>(Arrays.asList("my-scope")));
 
         when(roleService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(role)));
         when(clientService.findByDomain(DOMAIN)).thenReturn(Single.just(Collections.singleton(client)));

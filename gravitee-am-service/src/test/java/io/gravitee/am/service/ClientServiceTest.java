@@ -43,7 +43,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.runners.MockitoJUnitRunner;
+import sun.rmi.transport.TransportConstants;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,6 +76,9 @@ public class ClientServiceTest {
 
     @Mock
     private GrantTypeService grantTypeService;
+
+    @Mock
+    private ResponseTypeService responseTypeService;
 
     @Mock
     private IdentityProviderService identityProviderService;
@@ -449,6 +454,7 @@ public class ClientServiceTest {
         when(clientRepository.update(any(Client.class))).thenReturn(Single.just(new Client()));
         when(domainService.findById(DOMAIN)).thenReturn(Maybe.just(new Domain()));
         when(domainService.reload(eq(DOMAIN), any())).thenReturn(Single.just(new Domain()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
         when(scopeService.validateScope(DOMAIN,Collections.emptyList())).thenReturn(Single.just(true));
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();
@@ -481,6 +487,7 @@ public class ClientServiceTest {
         when(clientRepository.findById("my-client")).thenReturn(Maybe.just(new Client()));
         when(clientRepository.update(any(Client.class))).thenReturn(Single.error(TechnicalException::new));
         when(domainService.findById(DOMAIN)).thenReturn(Maybe.just(new Domain()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
         when(scopeService.validateScope(DOMAIN,Collections.emptyList())).thenReturn(Single.just(true));
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();
@@ -600,6 +607,7 @@ public class ClientServiceTest {
         when(updateClient.isDynamicClientRegistrationEnabled()).thenReturn(true);
         when(domainService.findById(DOMAIN)).thenReturn(Maybe.just(new Domain()));
         when(clientRepository.findById("my-client")).thenReturn(Maybe.just(new Client()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();
         testObserver.assertError(DynamicClientRegistrationException.class);
@@ -615,6 +623,7 @@ public class ClientServiceTest {
         when(updateClient.getRedirectUris()).thenReturn(Arrays.asList("http://localhost/callback"));
         when(domainService.findById(DOMAIN)).thenReturn(Maybe.just(new Domain()));
         when(clientRepository.findById("my-client")).thenReturn(Maybe.just(new Client()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();
         testObserver.assertError(InvalidRedirectUriException.class);
@@ -630,6 +639,7 @@ public class ClientServiceTest {
         when(updateClient.getRedirectUris()).thenReturn(Arrays.asList("http://gravitee.io/callback"));
         when(domainService.findById(DOMAIN)).thenReturn(Maybe.just(new Domain()));
         when(clientRepository.findById("my-client")).thenReturn(Maybe.just(new Client()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();
         testObserver.assertError(InvalidRedirectUriException.class);
@@ -645,6 +655,7 @@ public class ClientServiceTest {
         when(updateClient.getRedirectUris()).thenReturn(Arrays.asList("https://gravitee.io/*"));
         when(domainService.findById(DOMAIN)).thenReturn(Maybe.just(new Domain()));
         when(clientRepository.findById("my-client")).thenReturn(Maybe.just(new Client()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();
         testObserver.assertError(InvalidRedirectUriException.class);
@@ -659,6 +670,7 @@ public class ClientServiceTest {
         UpdateClient updateClient = Mockito.mock(UpdateClient.class);
         when(domainService.findById(DOMAIN)).thenReturn(Maybe.just(new Domain()));
         when(clientRepository.findById("my-client")).thenReturn(Maybe.just(new Client()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
         when(scopeService.validateScope(DOMAIN,Collections.emptyList())).thenReturn(Single.just(false));
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();
@@ -677,6 +689,7 @@ public class ClientServiceTest {
         when(domainService.reload(eq(DOMAIN), any())).thenReturn(Single.just(new Domain()));
         when(clientRepository.findById("my-client")).thenReturn(Maybe.just(new Client()));
         when(clientRepository.update(any(Client.class))).thenReturn(Single.just(new Client()));
+        when(responseTypeService.applyDefaultResponseType(any())).then(i -> i.getArguments()[0]);
         when(scopeService.validateScope(DOMAIN,Collections.emptyList())).thenReturn(Single.just(true));
 
         TestObserver testObserver = clientService.update(DOMAIN, "my-client", updateClient).test();

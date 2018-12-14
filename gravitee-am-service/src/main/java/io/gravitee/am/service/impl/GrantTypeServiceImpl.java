@@ -87,7 +87,7 @@ public class GrantTypeServiceImpl implements GrantTypeService {
         boolean updatedGrantType = false;
 
         Set responseType = new HashSet<>(client.getResponseTypes());
-        Set grantType = new HashSet<>(client.getGrantTypes());
+        Set grantType = new HashSet<>(client.getAuthorizedGrantTypes());
 
         //If response type contains "code", then grant_type must contains "authorization_code"
         if(responseType.contains(CODE) && !grantType.contains(AUTHORIZATION_CODE)) {
@@ -116,11 +116,11 @@ public class GrantTypeServiceImpl implements GrantTypeService {
         //Finally in case of bad client status (no response/grant type) reset to default values...
         if(responseType.size()==0 || grantType.size()==0) {
             client.setResponseTypes(Client.DEFAULT_RESPONSE_TYPES);
-            client.setGrantTypes(Client.DEFAULT_GRANT_TYPES);
+            client.setAuthorizedGrantTypes(Client.DEFAULT_GRANT_TYPES);
         }
         //if grant type list has been modified, then update it.
         else if(updatedGrantType) {
-            client.setGrantTypes((List<String>)grantType.stream().collect(Collectors.toList()));
+            client.setAuthorizedGrantTypes((List<String>)grantType.stream().collect(Collectors.toList()));
         }
 
         return client;

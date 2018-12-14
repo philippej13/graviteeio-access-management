@@ -32,7 +32,7 @@ public class PatchClient {
     private Optional<List<String>> redirectUris;
     private Optional<List<String>> grantTypes;
     private Optional<String> clientName;
-    private Optional<List<String>> scope;
+    private Optional<List<String>> scopes;
     private Optional<List<String>> autoApproveScopes;
     private Optional<Integer> accessTokenValiditySeconds;
     private Optional<Integer> refreshTokenValiditySeconds;
@@ -69,12 +69,12 @@ public class PatchClient {
         this.clientName = clientName;
     }
 
-    public Optional<List<String>> getScope() {
-        return scope;
+    public Optional<List<String>> getScopes() {
+        return scopes;
     }
 
-    public void setScope(Optional<List<String>> scope) {
-        this.scope = scope;
+    public void setScopes(Optional<List<String>> scopes) {
+        this.scopes = scopes;
     }
 
     public Optional<List<String>> getAutoApproveScopes() {
@@ -168,9 +168,9 @@ public class PatchClient {
     public Client patch(Client toPatch) {
 
         SetterUtils.safeSet(toPatch::setRedirectUris, this.getRedirectUris());
-        SetterUtils.safeSet(toPatch::setGrantTypes, this.getGrantTypes());
+        SetterUtils.safeSet(toPatch::setAuthorizedGrantTypes, this.getGrantTypes());
         SetterUtils.safeSet(toPatch::setClientName, this.getClientName());
-        SetterUtils.safeSet(toPatch::setScope, this.getScope());
+        SetterUtils.safeSet(toPatch::setScopes, this.getScopes());
         SetterUtils.safeSet(toPatch::setAutoApproveScopes, this.getAutoApproveScopes());
         SetterUtils.safeSet(toPatch::setAccessTokenValiditySeconds, this.getAccessTokenValiditySeconds(), int.class);
         SetterUtils.safeSet(toPatch::setRefreshTokenValiditySeconds, this.getRefreshTokenValiditySeconds(), int.class);
