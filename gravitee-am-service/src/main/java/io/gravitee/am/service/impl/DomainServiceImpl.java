@@ -196,6 +196,7 @@ public class DomainServiceImpl implements DomainService {
                 .flatMapSingle(oldDomain -> {
                     Domain toPatch = patchDomain.patch(oldDomain);
                     toPatch.setUpdatedAt(new Date());
+                    toPatch.setLastEvent(new Event(Type.DOMAIN, new Payload(domainId, domainId, Action.UPDATE)));
                     return domainRepository.update(toPatch);
                 })
                 .onErrorResumeNext(ex -> {
