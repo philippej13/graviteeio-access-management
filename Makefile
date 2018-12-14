@@ -126,6 +126,8 @@ status: ## See Access Management containers status
 connectMongo: ## Connect to mongo repository on gravitee-am database
 	@docker exec -ti gio_am_mongodb mongo gravitee-am
 
+reset: stop deleteData start ## Stop containers, delete mongodb data and restart container
+
 oidctest-run: oidctest-install oidctest-start ## Run openid-certification tools, using same docker network
 
 oidctest-install: # Clone openid-certification tools and set same docker network
@@ -145,6 +147,9 @@ oidctest-status: ## See OIDC containers status
 startAll: start oidctest-start ## Stop all running containers
 
 stopAll: stop oidctest-stop ## Stop all running containers
+
+deleteData: # remove mongodb data
+	@rm -rf .working/compose/data/am-mongodb
 
 deleteContainer: # delete image
 	@cd .working/compose ; docker-compose down
