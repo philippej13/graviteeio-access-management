@@ -65,7 +65,7 @@ public class JwkServiceImpl implements JwkService {
     @Override
     public Maybe<JWK> getKey(JWKSet jwkSet, String kid) {
 
-        if(jwkSet==null || jwkSet.getKeys().size()==0 || kid==null || kid.trim().isEmpty()) {
+        if(jwkSet==null || jwkSet.getKeys().isEmpty() || kid==null || kid.trim().isEmpty()) {
             return Maybe.empty();
         }
 

@@ -114,7 +114,7 @@ public class GrantTypeServiceImpl implements GrantTypeService {
         }
 
         //Finally in case of bad client status (no response/grant type) reset to default values...
-        if(responseType.size()==0 || grantType.size()==0) {
+        if(responseType.isEmpty() || grantType.isEmpty()) {
             client.setResponseTypes(Client.DEFAULT_RESPONSE_TYPES);
             client.setAuthorizedGrantTypes(Client.DEFAULT_GRANT_TYPES);
         }

@@ -278,7 +278,7 @@ public class ScopeServiceImpl implements ScopeService {
      */
     @Override
     public Single<Boolean> validateScope(String domain, List<String> scopes) {
-        if(scopes==null || scopes.size()==0) {
+        if(scopes==null || scopes.isEmpty()) {
             return Single.just(true);//nothing to do...
         }
 

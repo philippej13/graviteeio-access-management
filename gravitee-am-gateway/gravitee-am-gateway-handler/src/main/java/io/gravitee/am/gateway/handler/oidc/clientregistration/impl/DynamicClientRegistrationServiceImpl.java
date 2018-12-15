@@ -86,7 +86,7 @@ public class DynamicClientRegistrationServiceImpl implements DynamicClientRegist
     public Single<Client> applyDefaultIdentityProvider(String domain, Client client) {
         return identityProviderService.findByDomain(domain)
             .map(identityProviders -> {
-                if(identityProviders!=null && identityProviders.size()>0) {
+                if(identityProviders!=null && !identityProviders.isEmpty()) {
                     client.setIdentities(Collections.singleton(identityProviders.get(0).getId()));
                 }
                 return client;
@@ -104,7 +104,7 @@ public class DynamicClientRegistrationServiceImpl implements DynamicClientRegist
     public Single<Client> applyDefaultCertificateProvider(String domain, Client client) {
         return certificateService.findByDomain(domain)
                 .map(certificates -> {
-                    if(certificates!=null && certificates.size()>0) {
+                    if(certificates!=null && !certificates.isEmpty()) {
                         client.setCertificate(certificates.get(0).getId());
                     }
                     return client;
@@ -205,7 +205,7 @@ public class DynamicClientRegistrationServiceImpl implements DynamicClientRegist
                             .filter(redirectUri -> !allowedRedirectUris.contains(redirectUri))
                             .collect(ArrayList<String>::new, (list, missingRedirectUri)-> list.add(missingRedirectUri))
                             .flatMap(missing -> {
-                                if(missing.size()>0) {
+                                if(!missing.isEmpty()) {
                                     return Single.error(
                                             new InvalidRedirectUriException("redirect uris are not allowed according to sector_identifier_uri: "+
                                                     String.join(" ",missing)
