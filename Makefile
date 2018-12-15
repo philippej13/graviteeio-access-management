@@ -152,8 +152,8 @@ deleteData: # remove mongodb data
 	@rm -rf .working/compose/data/am-mongodb
 
 deleteContainer: # delete image
-	@cd .working/compose ; docker-compose down
-	@cd .working/oidctest/docker ; docker-compose down
+	@$(shell docker-compose -f .working/compose/docker-compose.yml down &>/dev/null || true)
+	@$(shell docker-compose -f .working/oidctest/docker/docker-compose.yml down &>/dev/null || true)
 
 deleteImage: # delete image
 	@docker rmi -f $(GIO_AM_GATEWAY_IMAGE):$(GIO_AM_VERSION)
@@ -165,7 +165,7 @@ deleteOidcTest: # delete Oidc Test
 	@cd $(OIDC_TEST_FOLDER)/docker ; docker-compose down
 	@rm -rf $(OIDC_TEST_FOLDER)
 
-prune: deleteContainer deleteImage deleteNetwork ## /!\ Erase all (repositories folder & volumes, containers, images & data)
+prune: deleteData deleteContainer deleteImage deleteNetwork ## /!\ Erase all (repositories folder & volumes, containers, images & data)
 	@rm -rf .working
 
 .DEFAULT_GOAL := help
