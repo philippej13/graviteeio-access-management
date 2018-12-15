@@ -37,5 +37,7 @@ public class ClientRegistrationDisabledException extends OAuth2Exception {
     }
 
     @Override
-    public int getHttpStatusCode() {return HttpStatusCode.UNAUTHORIZED_401; }
+    public int getHttpStatusCode() {
+        return HttpStatusCode.FORBIDDEN_403;
+    }
 }
