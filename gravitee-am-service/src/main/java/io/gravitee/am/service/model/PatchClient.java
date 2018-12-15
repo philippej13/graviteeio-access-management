@@ -32,7 +32,7 @@ import java.util.Set;
 public class PatchClient {
 
     private Optional<List<String>> redirectUris;
-    private Optional<List<String>> grantTypes;
+    private Optional<List<String>> authorizedGrantTypes;
     private Optional<List<String>> responseTypes;
     private Optional<String> applicationType;
     private Optional<List<String>> contacts;
@@ -90,12 +90,12 @@ public class PatchClient {
         this.redirectUris = redirectUris;
     }
 
-    public Optional<List<String>> getGrantTypes() {
-        return grantTypes;
+    public Optional<List<String>> getAuthorizedGrantTypes() {
+        return authorizedGrantTypes;
     }
 
-    public void setGrantTypes(Optional<List<String>> grantTypes) {
-        this.grantTypes = grantTypes;
+    public void setAuthorizedGrantTypes(Optional<List<String>> authorizedGrantTypes) {
+        this.authorizedGrantTypes = authorizedGrantTypes;
     }
 
     public Optional<List<String>> getResponseTypes() {
@@ -477,7 +477,7 @@ public class PatchClient {
     public Client patch(Client toPatch) {
 
         SetterUtils.safeSet(toPatch::setRedirectUris, this.getRedirectUris());
-        SetterUtils.safeSet(toPatch::setAuthorizedGrantTypes, this.getGrantTypes());
+        SetterUtils.safeSet(toPatch::setAuthorizedGrantTypes, this.getAuthorizedGrantTypes());
         SetterUtils.safeSet(toPatch::setResponseTypes, this.getResponseTypes());
         SetterUtils.safeSet(toPatch::setApplicationType, this.getApplicationType());
         SetterUtils.safeSet(toPatch::setContacts,this.getContacts());
