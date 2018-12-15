@@ -22,7 +22,6 @@ import io.gravitee.am.service.DomainService;
 import io.gravitee.am.service.exception.ClientNotFoundException;
 import io.gravitee.am.service.exception.DomainNotFoundException;
 import io.gravitee.am.service.model.PatchClient;
-import io.gravitee.am.service.model.UpdateClient;
 import io.gravitee.common.http.MediaType;
 import io.reactivex.Maybe;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +32,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Response;
@@ -100,18 +105,18 @@ public class ClientResource extends AbstractResource {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update a client")
+    @ApiOperation(value = "Update (apply a patch) client")
     @ApiResponses({
             @ApiResponse(code = 200, message = "Client successfully updated", response = Client.class),
             @ApiResponse(code = 500, message = "Internal server error")})
     public void update(
             @PathParam("domain") String domain,
             @PathParam("client") String client,
-            @ApiParam(name = "client", required = true) @Valid @NotNull UpdateClient updateClient,
+            @ApiParam(name = "client", required = true) @Valid @NotNull PatchClient patchClient,
             @Suspended final AsyncResponse response) {
         domainService.findById(domain)
                 .switchIfEmpty(Maybe.error(new DomainNotFoundException(domain)))
-                .flatMapSingle(irrelevant -> clientService.update(domain, client, updateClient))
+                .flatMapSingle(irrelevant -> clientService.patch(domain, client, patchClient))
                 .map(client1 -> Response.ok(client1).build())
                 .subscribe(
                         result -> response.resume(result),
