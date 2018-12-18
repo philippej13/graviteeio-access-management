@@ -21,6 +21,7 @@ import io.gravitee.am.common.oauth2.ResponseType;
 import io.gravitee.am.common.oidc.ClaimType;
 import io.gravitee.am.common.oidc.ClientAuthenticationMethod;
 import io.gravitee.am.common.oidc.Scope;
+import io.gravitee.am.common.oidc.SubjectType;
 import io.gravitee.am.gateway.handler.oidc.discovery.OpenIDDiscoveryService;
 import io.gravitee.am.gateway.handler.oidc.discovery.OpenIDProviderMetadata;
 import io.gravitee.am.model.Domain;
@@ -81,6 +82,7 @@ public class OpenIDDiscoveryServiceImpl implements OpenIDDiscoveryService {
         openIDProviderMetadata.setClaimsSupported(Stream.of(Scope.values()).map(Scope::getClaims).flatMap(Collection::stream).distinct().collect(Collectors.toList()));
         openIDProviderMetadata.setCodeChallengeMethodsSupported(Arrays.asList(CodeChallengeMethod.PLAIN, CodeChallengeMethod.S256));
         openIDProviderMetadata.setClaimsParameterSupported(true);
+        openIDProviderMetadata.setSubjectTypesSupported(Arrays.asList(SubjectType.PUBLIC));
 
         return openIDProviderMetadata;
     }
