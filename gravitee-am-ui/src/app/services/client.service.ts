@@ -37,7 +37,7 @@ export class ClientService {
   }
 
   update(domainId, id, client): Observable<Response> {
-    return this.http.put(this.clientsURL + domainId + "/clients/" + id, {
+    return this.http.patch(this.clientsURL + domainId + "/clients/" + id, {
       'clientName': client.clientName,
       'redirectUris': client.redirectUris,
       'authorizedGrantTypes': client.authorizedGrantTypes,
@@ -52,7 +52,8 @@ export class ClientService {
       'oauth2Identities': client.oauth2Identities,
       'certificate': client.certificate,
       'enhanceScopesWithUserPermissions' : client.enhanceScopesWithUserPermissions,
-      'dynamicClientRegistrationEnabled' : client.dynamicClientRegistrationEnabled
+      'dynamicClientRegistrationEnabled' : client.dynamicClientRegistrationEnabled,
+      'responseTypes' : client.responseTypes
     });
   }
 

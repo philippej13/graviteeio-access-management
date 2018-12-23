@@ -38,25 +38,25 @@ public class GrantTypeServiceTest {
     private GrantTypeService grantTypeService = new GrantTypeServiceImpl();
 
     @Test
-    public void test_code_implicit_refresh_token() {
+    public void isValidGrantType_authorization_code_implicit_refresh_token() {
         boolean isValid = this.grantTypeService.isValideGrantType(Arrays.asList("authorization_code", "implicit", "refresh_token"));
         assertTrue("Were expecting to be true",isValid);
     }
 
     @Test
-    public void test_unknown_response_type() {
+    public void isValidGrantType_unknown_response_type() {
         boolean isValid = this.grantTypeService.isValideGrantType(Arrays.asList("unknown"));
         assertFalse("Were expecting to be false",isValid);
     }
 
     @Test
-    public void test_empty_response_type() {
+    public void isValidGrantType_empty_response_type() {
         boolean isValid = this.grantTypeService.isValideGrantType(Arrays.asList());
         assertFalse("Were expecting to be false",isValid);
     }
 
     @Test
-    public void testCompleteGrantTypeCorrespondance_missingCodeGrantType() {
+    public void completeGrantTypeCorrespondance_missingCodeGrantType() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList("code"));
         client.setAuthorizedGrantTypes(Arrays.asList());
@@ -66,7 +66,7 @@ public class GrantTypeServiceTest {
     }
 
     @Test
-    public void testCompleteGrantTypeCorrespondance_missingImplicitGrantType() {
+    public void completeGrantTypeCorrespondance_missingImplicitGrantType() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList("id_token"));
         client.setAuthorizedGrantTypes(Arrays.asList("authorization_code"));
@@ -77,7 +77,7 @@ public class GrantTypeServiceTest {
     }
 
     @Test
-    public void testCompleteGrantTypeCorrespondance_removeImplicitGrantType() {
+    public void completeGrantTypeCorrespondance_removeImplicitGrantType() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList("code"));
         client.setAuthorizedGrantTypes(Arrays.asList("implicit"));
@@ -88,7 +88,18 @@ public class GrantTypeServiceTest {
     }
 
     @Test
-    public void testCompleteGrantTypeCorrespondance_caseAllEmpty() {
+    public void completeGrantTypeCorrespondance_caseNoResponseType() {
+        Client client = new Client();
+        client.setResponseTypes(Arrays.asList());
+        client.setAuthorizedGrantTypes(Arrays.asList("client_credentials"));
+
+        client = this.grantTypeService.completeGrantTypeCorrespondance(client);
+        assertTrue("was expecting code grant type",client.getResponseTypes().isEmpty());
+        assertTrue("was expecting code grant type",client.getAuthorizedGrantTypes().contains("client_credentials"));
+    }
+
+    @Test
+    public void completeGrantTypeCorrespondance_caseAllEmpty() {
         Client client = new Client();
         client.setResponseTypes(Arrays.asList());
         client.setAuthorizedGrantTypes(Arrays.asList());
